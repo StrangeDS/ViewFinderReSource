@@ -17,7 +17,8 @@ public class ViewFinderCore : ModuleRules
 				"InputCore",
 				"EnhancedInput",
 				"GeometryCore",
-				"GeometryScriptingCore"
+				"GeometryScriptingCore",
+				"UMG"
 			});
 
 		PublicIncludePaths.AddRange(new string[] { "ViewFinderCore/Public" });

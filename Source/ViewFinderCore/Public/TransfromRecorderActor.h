@@ -22,8 +22,8 @@ protected:
 public:	
 	virtual void Tick(float DeltaTime) override;
 
-	// 编辑器中调用, 筛选: 哪些物体需要被记录Transform. 默认实现为所有的AStaticMeshActor
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, CallInEditor, Category = "ViewFinder")
+	// 筛选: 哪些物体需要被记录Transform. 默认实现为所有的AStaticMeshActor
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "ViewFinder")
 	void ReCollectComponents();
 	void ReCollectComponents_Implementation();
 

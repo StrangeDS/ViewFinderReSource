@@ -1,61 +1,70 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Components/SceneCaptureComponent2D.h"
+#include "GameFramework/Actor.h"
+
+#include "VF_InteractInterface.h"
+
 #include "PhotoCatcher.generated.h"
 
-class UTextureRenderTarget2D;
+class UStaticMeshComponent;
+class UPhotoCaptureComponent;
+class UViewFrustumComponent;
+class UUserWidget;
 
-UCLASS(ClassGroup = (ViewFinder), meta = (BlueprintSpawnableComponent))
-class VIEWFINDERCORE_API UPhotoCatcher : public USceneCaptureComponent2D
+UCLASS(Blueprintable, ClassGroup = (ViewFinder))
+class VIEWFINDERCORE_API APhotoCatcher : public AActor, public IVF_InteractInterface
 {
 	GENERATED_BODY()
 	
-// public:
-// 	UPhotoCatcher();
+public:	
+	APhotoCatcher();
 
-// 	void BeginPlay() override;
+	virtual void OnConstruction(const FTransform &Transform) override;
 
-// 	void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction) override;
+// #if WITH_EDITOR
+// 	virtual void PostEditChangeProperty(FPropertyChangedEvent& Event) override;
+// #endif
 
-// 	virtual void DrawImage();
+protected:
+	virtual void BeginPlay() override;
 
-// 	virtual void CatchObjs();
+public:	
+	virtual void Tick(float DeltaTime) override;
 
-
-// public: //From UCameraComponent
-// 	virtual void OnRegister() override;
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ViewFinder")
+	float ViewAngle = 90.0f;
 	
-// 	static void AddReferencedObjects(UObject* InThis, FReferenceCollector& Collector);
-
-// 	virtual void OnComponentDestroyed(bool bDestroyingHierarchy) override;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ViewFinder")
+	float AspectRatio = 16.0f / 9;
 	
-// 	void UpdateCone();
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ViewFinder")
+	float StartDis = 10.0f;
 	
-// protected:
-// 	UTextureRenderTarget2D* Target2D;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ViewFinder")
+	float EndDis = 1000.0f;
 
-// 	TObjectPtr<class UDrawFrustumComponent> DrawFrustum;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ViewFinder")
+	TObjectPtr<UStaticMeshComponent> StaticMesh;
 
-// 	UPROPERTY(VisibleAnywhere)
-// 	UDynamicMeshComponent *Cone = nullptr;
-
-// 	UPROPERTY(VisibleAnywhere)
-// 	bool IsVideoMode = false;
-
-// 	UPROPERTY(EditAnywhere, Category = "Demo")
-// 	float ClipFar = 3000.0f;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ViewFinder")
+	TObjectPtr<UPhotoCaptureComponent> PhotoCapture;
 	
-// 	UPROPERTY(EditAnywhere, Category = "Demo")
-// 	float AngleHor = 180;
-	
-// 	UPROPERTY(EditAnywhere, Category = "Demo")
-// 	float AngleVer = 100;
-	
-// 	UPROPERTY(EditAnywhere, Category = "Demo")
-// 	int Width = 1024;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ViewFinder")
+	TObjectPtr<UViewFrustumComponent> ViewFrustum;
 
-// 	UPROPERTY(EditAnywhere, Category = "Demo")
-// 	int Height = 1024;
+protected:	// IVF_InteractInterface needs
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ViewFinder")
+	TSubclassOf<UUserWidget> HintUMGClass;
 	
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "ViewFinder")
+	TObjectPtr<UUserWidget> HintUMG;
+
+public:		// implements IVF_InteractInterface
+	virtual bool StartAiming_Implementation(APlayerController* Controller);
+
+	virtual bool EndAiming_Implementation(APlayerController* Controller);
+
+	virtual bool Interact_Implementation(APlayerController* Controller);
 };

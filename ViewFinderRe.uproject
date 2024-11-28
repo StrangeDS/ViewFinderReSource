@@ -21,7 +21,10 @@
 		{
 			"Name": "ViewFinderDemo",
 			"Type": "Runtime",
-			"LoadingPhase": "Default"
+			"LoadingPhase": "Default",
+			"AdditionalDependencies": [
+				"ViewFinderCore"
+			]
 		}
 	],
 	"Plugins": [

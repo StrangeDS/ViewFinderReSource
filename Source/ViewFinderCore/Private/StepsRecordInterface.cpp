@@ -9,3 +9,8 @@ bool IStepsRecordInterface::StepBack_Implementation(FString &Step)
 {
     return false;
 }
+
+bool IStepsRecordInterface::WhetherToTick_Implementation()
+{
+    return false;
+}

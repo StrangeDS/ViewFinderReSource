@@ -1,38 +1,49 @@
 #include "ViewFrustumComponent.h"
 
-#include "GeometryScript/CollisionFunctions.h"
-#include "GeometryScript/MeshPrimitiveFunctions.h"
+#include "GeometryScript/MeshBasicEditFunctions.h"
 
 UViewFrustumComponent::UViewFrustumComponent()
 {
 }
 
-void UViewFrustumComponent::GenerateViewFrustum_Implementation()
+// 默认实现: 从简单盒上修改点位置.
+void UViewFrustumComponent::GenerateViewFrustum_Implementation(float Angle, float AspectRatio, float StartDis, float EndDis)
 {
-	// C++写不能很好地定义参数，但处于性能考虑预留。
-    // AppendBox( 
-    // UDynamicMesh* TargetMesh, 
-    // FGeometryScriptPrimitiveOptions PrimitiveOptions,
-    // FTransform Transform,
-    // float DimensionX = 100,
-    // float DimensionY = 100,
-    // float DimensionZ = 100,
-    // int32 StepsX = 0,
-    // int32 StepsY = 0,
-    // int32 StepsZ = 0,
-    // EGeometryScriptPrimitiveOriginMode Origin = EGeometryScriptPrimitiveOriginMode::Base,
-    // UGeometryScriptDebug* Debug = nullptr);
+    check(Angle > 0.0f && Angle < 360.0f);
+    check(AspectRatio > 0.0f && AspectRatio < 10.0f);
+    check(StartDis > 0.0f);
+    check(EndDis > 0.0f && StartDis < EndDis);
 
-    // SetDynamicMeshCollisionFromMesh(
-    // UDynamicMesh* FromDynamicMesh, 
-    // UDynamicMeshComponent* ToDynamicMeshComponent,
-    // FGeometryScriptCollisionFromMeshOptions Options,
-    // UGeometryScriptDebug* Debug = nullptr);
+    FTransform Transform;
+    UGeometryScriptLibrary_MeshPrimitiveFunctions::AppendBox(MeshObject, PrimitiveOptions, Transform);
+
+    TArray<FVector> Positions;
+    {
+        Positions.Reserve(8);
+        auto CalculatePositions = [&](float Distance) {
+            float x = Distance;
+            float y = Distance * tanf(FMath::DegreesToRadians(Angle) / 2);
+            float z = y / AspectRatio;
+            Positions.Push({x, -y, -z});
+            Positions.Push({x, y, -z});
+            Positions.Push({x, y, z});
+            Positions.Push({x, -y, z});
+        };
+        CalculatePositions(StartDis);
+        CalculatePositions(EndDis);
+    }
+    for (int i = 0; i < 8; i++) {
+        bool Success;
+        UGeometryScriptLibrary_MeshBasicEditFunctions::SetVertexPosition(MeshObject, i, Positions[i], Success, i != 7);
+    }
+    UGeometryScriptLibrary_CollisionFunctions::SetDynamicMeshCollisionFromMesh(MeshObject, this, CollisionOptions);
+    
+    if (Matirial) SetMaterial(0, Matirial);
 }
 
-void UViewFrustumComponent::RegenerateViewFrustum()
+void UViewFrustumComponent::RegenerateViewFrustum(float Angle, float AspectRatio, float StartDis, float EndDis)
 {
     MeshObject->Reset();
 
-    GenerateViewFrustum();
+    GenerateViewFrustum(Angle, AspectRatio, StartDis, EndDis);
 }

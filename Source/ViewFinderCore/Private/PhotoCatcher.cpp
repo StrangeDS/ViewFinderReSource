@@ -1,116 +1,79 @@
 #include "PhotoCatcher.h"
 
-// UPhotoCatcher::UPhotoCatcher()
+#include "Blueprint/UserWidget.h"
+#include "Components/StaticMeshComponent.h"
+
+#include "PhotoCaptureComponent.h"
+#include "ViewFrustumComponent.h"
+
+APhotoCatcher::APhotoCatcher()
+{
+	PrimaryActorTick.bCanEverTick = false;
+
+	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
+	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
+	StaticMesh->SetupAttachment(RootComponent);
+	PhotoCapture = CreateDefaultSubobject<UPhotoCaptureComponent>(TEXT("PhotoCapture"));
+	PhotoCapture->SetupAttachment(RootComponent);
+	ViewFrustum = CreateDefaultSubobject<UViewFrustumComponent>(TEXT("ViewFrustum"));
+	ViewFrustum->SetupAttachment(RootComponent);
+}
+
+void APhotoCatcher::OnConstruction(const FTransform &Transform)
+{
+	Super::OnConstruction(Transform);
+
+	ViewFrustum->RegenerateViewFrustum(ViewAngle, AspectRatio, StartDis, EndDis);
+	// TODO: Sync PhotoCapture.
+}
+
+// #if WITH_EDITOR
+// void APhotoCatcher::PostEditChangeProperty(FPropertyChangedEvent &Event)
 // {
-// }
-
-// void UPhotoCatcher::BeginPlay()
-// {
-//     Target2D = NewObject<UTextureRenderTarget2D>(this);
-//     TextureTarget = Target2D;
-// 	Target2D->ResizeTarget(Width, Height);
-// 	Target2D->RenderTargetFormat = ETextureRenderTargetFormat::RTF_RGBA8;
-// 	Target2D->ConstructTexture2D(this, FName(), EObjectFlags::RF_NoFlags);
-// }
-
-// void UPhotoCatcher::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction)
-// {
-// 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-//     if (IsVideoMode) {
-//         CaptureScene();
-//     }
-
-//     UCameraComponent dsad;
-// }
-
-// void UPhotoCatcher::DrawImage()
-// {
-//     CaptureScene();
-//     CatchObjs();
-// }
-
-// void UPhotoCatcher::CatchObjs()
-// {
-
-// }
-
-// void UPhotoCatcher::UpdateCone()
-// {
-// 	if (Cone != nullptr)
+// 	const FName PropertyName = Event.Property ? Event.Property->GetFName(): NAME_None;
+// 	if (PropertyName == GET_MEMBER_NAME_CHECKED(APhotoCatcher, ViewAngle)
+// 	|| PropertyName == GET_MEMBER_NAME_CHECKED(APhotoCatcher, AspectRatio)
+// 	|| PropertyName == GET_MEMBER_NAME_CHECKED(APhotoCatcher, StartDis)
+// 	|| PropertyName == GET_MEMBER_NAME_CHECKED(APhotoCatcher, EndDis))
 // 	{
-// 		bool bAnythingChanged = false;
-// 		const float FrustumDrawDistance = 1000.0f;
-// 		if (ProjectionMode == ECameraProjectionMode::Perspective)
-// 		{
-// 			if (DrawFrustum->FrustumAngle != FieldOfView ||
-// 				DrawFrustum->FrustumStartDist != 10.f ||
-// 				DrawFrustum->FrustumEndDist != DrawFrustum->FrustumStartDist + FrustumDrawDistance)
-// 			{
-// 				DrawFrustum->FrustumAngle = FieldOfView;
-// 				DrawFrustum->FrustumStartDist = 10.f;
-// 				DrawFrustum->FrustumEndDist = DrawFrustum->FrustumStartDist + FrustumDrawDistance;
-// 				bAnythingChanged = true;
-// 			}
-// 		}
-// 		else
-// 		{
-// 			if (DrawFrustum->FrustumAngle != -OrthoWidth ||
-// 				DrawFrustum->FrustumStartDist != OrthoNearClipPlane ||
-// 				DrawFrustum->FrustumEndDist != FMath::Min(OrthoFarClipPlane - OrthoNearClipPlane, FrustumDrawDistance))
-// 			{
-// 				DrawFrustum->FrustumAngle = -OrthoWidth;
-// 				DrawFrustum->FrustumStartDist = OrthoNearClipPlane;
-// 				DrawFrustum->FrustumEndDist = FMath::Min(OrthoFarClipPlane - OrthoNearClipPlane, FrustumDrawDistance);
-// 				bAnythingChanged = true;
-// 			}
-// 		}
-
-// 		if (DrawFrustum->FrustumAspectRatio != AspectRatio)
-// 		{
-// 			DrawFrustum->FrustumAspectRatio = AspectRatio;
-// 			bAnythingChanged = true;
-// 		}	
-		
-// 		if (bAnythingChanged)
-// 		{
-// 			DrawFrustum->MarkRenderStateDirty();
-// 		}
+// 		ViewFrustum->RegenerateViewFrustum(ViewAngle, AspectRatio, StartDis, EndDis);
 // 	}
+
+// 	Super::PostEditChangeProperty(Event);
 // }
+// #endif
 
-// void UPhotoCatcher::OnRegister()
-// {
-// 	AActor* MyOwner = GetOwner();
-// 	if ((MyOwner != nullptr) && !IsRunningCommandlet())
-//     {
-// 		if (DrawFrustum == nullptr)
-// 		{
-// 			DrawFrustum = NewObject<UDrawFrustumComponent>(MyOwner, NAME_None, RF_Transactional | RF_TextExportTransient);
-// 			DrawFrustum->SetupAttachment(this);
-// 			DrawFrustum->SetIsVisualizationComponent(true);
-// 			DrawFrustum->CreationMethod = CreationMethod;
-// 			DrawFrustum->bFrustumEnabled = bDrawFrustumAllowed;
-// 			DrawFrustum->RegisterComponentWithWorld(GetWorld());
-// 		}
-//     }
+void APhotoCatcher::BeginPlay()
+{
+	Super::BeginPlay();
+	
+}
 
-// 	RefreshVisualRepresentation();
-    
-// 	Super::OnRegister();
-// }
+void APhotoCatcher::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
 
-// void UPhotoCatcher::AddReferencedObjects(UObject *InThis, FReferenceCollector &Collector)
-// {
-// 	UPhotoCatcher* This = CastChecked<UPhotoCatcher>(InThis);
-// 	Collector.AddReferencedObject(This->DrawFrustum);
+}
 
-// 	Super::AddReferencedObjects(InThis, Collector);
-// }
+bool APhotoCatcher::StartAiming_Implementation(APlayerController *Controller)
+{
+	if (!HintUMGClass.Get())
+    	return false;
 
-// void UPhotoCatcher::OnComponentDestroyed(bool bDestroyingHierarchy)
-// {
-// 	Super::OnComponentDestroyed(bDestroyingHierarchy);
+	if (!HintUMG) {
+		HintUMG = CreateWidget<UUserWidget>(GetWorld(), HintUMGClass, TEXT("HintUMG"));
+	}
+	HintUMG->AddToViewport();
+	return true;
+}
 
-//     if (DrawFrustum) DrawFrustum->DestroyComponent();
-// }
+bool APhotoCatcher::EndAiming_Implementation(APlayerController *Controller)
+{
+	if (HintUMG) HintUMG->RemoveFromParent();
+    return true;
+}
+
+bool APhotoCatcher::Interact_Implementation(APlayerController *Controller)
+{
+    return false;
+}

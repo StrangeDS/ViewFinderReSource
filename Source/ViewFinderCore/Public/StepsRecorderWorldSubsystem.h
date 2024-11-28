@@ -11,4 +11,5 @@ class VIEWFINDERCORE_API UStepsRecorderWorldSubsystem : public UTickableWorldSub
 {
 	GENERATED_BODY()
 	
+	virtual TStatId GetStatId() const override;
 };

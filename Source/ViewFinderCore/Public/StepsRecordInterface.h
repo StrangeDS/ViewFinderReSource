@@ -48,4 +48,8 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ViewFinder")
 	bool StepBack(FString &Step);
 	virtual bool StepBack_Implementation(FString &Step);
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ViewFinder")
+	bool WhetherToTick();
+	virtual bool WhetherToTick_Implementation();
 };

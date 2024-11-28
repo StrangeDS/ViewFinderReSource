@@ -1,6 +1,5 @@
 #include "PhotoCaptureComponent.h"
 
-
 #include "Engine/TextureRenderTarget2D.h"
 #include "Materials/MaterialInstanceDynamic.h"
 

@@ -2,15 +2,15 @@
 
 #include "CoreMinimal.h"
 #include "UObject/Interface.h"
-#include "InteractInterface.generated.h"
+#include "VF_InteractInterface.generated.h"
 
 UINTERFACE(MinimalAPI, Blueprintable)
-class UInteractInterface : public UInterface
+class UVF_InteractInterface : public UInterface
 {
 	GENERATED_BODY()
 };
 
-class VIEWFINDERCORE_API IInteractInterface
+class VIEWFINDERCORE_API IVF_InteractInterface
 {
 	GENERATED_BODY()
 
