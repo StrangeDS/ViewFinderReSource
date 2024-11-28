@@ -38,13 +38,13 @@ protected:
 	FName TextureName = TEXT("Texture");
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "ViewFinder")
-	UStaticMeshComponent *StaticMesh = nullptr;
+	TObjectPtr<UStaticMeshComponent> StaticMesh;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ViewFinder")
-	UTextureRenderTarget2D *RenderTarget = nullptr;
+	TObjectPtr<UTextureRenderTarget2D> RenderTarget = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ViewFinder")
-	UMaterialInstanceDynamic *MaterialInstance = nullptr;
+	TObjectPtr<UMaterialInstanceDynamic> MaterialInstance = nullptr;
 
 	// UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ViewFinder")
 	// TEnumAsByte<ETextureRenderTargetFormat> Format;

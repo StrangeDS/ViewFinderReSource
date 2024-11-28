@@ -23,8 +23,8 @@ public:
 	
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ViewFinder")
-	UDynamicMeshPool* PlacingPool;
+	TObjectPtr<UDynamicMeshPool> PlacingPool;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ViewFinder")
-	UDynamicMeshPool* ComputingPool;
+	TObjectPtr<UDynamicMeshPool> ComputingPool;
 };

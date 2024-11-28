@@ -30,14 +30,17 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "ViewFinder")
 	int Height = 1024;
 
-	bool bUsingInstance = false;
+	UPROPERTY(EditAnywhere, Category = "ViewFinder")
+	FName TextureName = TEXT("Temp");
 
 	UPROPERTY()
-	UTextureRenderTarget2D* Target2D;
+	TObjectPtr<UTextureRenderTarget2D> Target2D;
 	
 	UPROPERTY()
-	UMaterialInstanceDynamic* MaterialInstance;
+	TObjectPtr<UMaterialInstanceDynamic> MaterialInstance;
 	
-	FName TextureName;
-	UTexture* OriginalTexture;
+	UPROPERTY()
+	TObjectPtr<UTexture> OriginalTexture;
+
+	bool bUsingInstance = false;
 };

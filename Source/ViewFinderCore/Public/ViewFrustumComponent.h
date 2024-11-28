@@ -33,5 +33,5 @@ protected:
     FGeometryScriptCollisionFromMeshOptions CollisionOptions;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ViewFinder")
-	UMaterialInterface* Matirial = nullptr;
+	TObjectPtr<UMaterialInterface> Matirial;
 };
