@@ -10,7 +10,7 @@ class UVF_InteractInterface : public UInterface
 	GENERATED_BODY()
 };
 
-class VIEWFINDERCORE_API IVF_InteractInterface
+class VIEWFINDERDEMO_API IVF_InteractInterface
 {
 	GENERATED_BODY()
 
