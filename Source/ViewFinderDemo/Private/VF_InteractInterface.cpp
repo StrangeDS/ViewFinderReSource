@@ -14,3 +14,8 @@ bool IVF_InteractInterface::Interact_Implementation(APlayerController *Controlle
 {
     return false;
 }
+
+bool IVF_InteractInterface::IsEnabled_Implementation(APlayerController *Controller)
+{
+    return true;
+}

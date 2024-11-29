@@ -4,6 +4,10 @@
 
 #include "PhotoCaptureComponent.h"
 #include "ViewFrustumComponent.h"
+#include "VFDynamicMeshComponent.h"
+#include "ViewFinderFunctions.h"
+
+#include "Kismet/KismetSystemLibrary.h"
 
 APhotoCatcher::APhotoCatcher()
 {
@@ -45,11 +49,24 @@ void APhotoCatcher::OnConstruction(const FTransform &Transform)
 void APhotoCatcher::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 void APhotoCatcher::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+}
 
+void APhotoCatcher::TakeAPhoto_Implementation()
+{
+	TArray<UPrimitiveComponent *> OverlapComps;
+	UKismetSystemLibrary::ComponentOverlapComponents(
+		ViewFrustum,
+		ViewFrustum->GetComponentToWorld(),
+		ObjectTypesToOverlap,
+		UPrimitiveComponent::StaticClass(),
+		ActorsToIgnore,
+		OverlapComps);
+	UE_LOG(LogTemp, Warning, TEXT("TakeAPhoto_Implementation overlaps %i"), OverlapComps.Num());
+	TArray<UVFDynamicMeshComponent *> VFDMComps = UViewFinderFunctions::CheckVFDMComps(OverlapComps);
+	TArray<AActor *> Copied = UViewFinderFunctions::CopyActorFromVFDMComps(VFDMComps);
 }

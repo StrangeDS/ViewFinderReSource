@@ -13,19 +13,60 @@ UCLASS(Blueprintable, ClassGroup = (ViewFinder))
 class VIEWFINDERDEMO_API APhotoCatcher_Interact : public APhotoCatcher, public IVF_InteractInterface
 {
 	GENERATED_BODY()
+	
+public:
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "ViewFinder")
+	bool bInteractingEnabled = true;
 
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "ViewFinder")
+	TEnumAsByte<ECollisionEnabled::Type> CollisionEnabledRecord;
+
+	virtual bool StartAiming_Implementation(APlayerController *Controller) override;
+
+	virtual bool EndAiming_Implementation(APlayerController *Controller) override;
+
+	virtual bool Interact_Implementation(APlayerController *Controller) override;
+
+	virtual bool IsEnabled_Implementation(APlayerController *Controller) override;
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ViewFinder")
+	void EnableInteract(bool Enabled);
+	virtual void EnableInteract_Implementation(bool Enabled);
+
+public:
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ViewFinder")
+	void CloseToPreview();
+	virtual void CloseToPreview_Implementation();
+	
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ViewFinder")
+	void LeaveFromPreview();
+	virtual void LeaveFromPreview_Implementation();
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ViewFinder")
-	TSubclassOf<UUserWidget> HintUMGClass;
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "ViewFinder")
-	TObjectPtr<UUserWidget> HintUMG;
+	TSubclassOf<UUserWidget> AimingHintUMGClass;
 
-public:
-	virtual bool StartAiming_Implementation(APlayerController* Controller);
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "ViewFinder")
+	TObjectPtr<UUserWidget> AimingHintUMG;
 
-	virtual bool EndAiming_Implementation(APlayerController* Controller);
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "ViewFinder")
+	bool bReady = false;
 
-	virtual bool Interact_Implementation(APlayerController* Controller);
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ViewFinder")
+	float TimeOfClose = 0.5f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ViewFinder")
+	float TimeOfLeave = 0.1f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ViewFinder")
+	class UInputMappingContext *AimingMappingContext;
+
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "ViewFinder")
+	FTimerHandle PreviewTimeHanlde;
+
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "ViewFinder")
+	TObjectPtr<APawn> Pawn;
+
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "ViewFinder")
+	TObjectPtr<APlayerController> PlayerController;
 };

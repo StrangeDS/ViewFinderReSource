@@ -28,6 +28,13 @@ protected:
 public:	
 	virtual void Tick(float DeltaTime) override;
 
+public:
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ViewFinder")
+	void TakeAPhoto();
+	virtual void TakeAPhoto_Implementation();
+
+
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ViewFinder")
 	float ViewAngle = 90.0f;
@@ -41,7 +48,13 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ViewFinder")
 	float EndDis = 1000.0f;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "ViewFinder")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ViewFinder")
+	TArray<TObjectPtr<AActor>> ActorsToIgnore;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ViewFinder")
+	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypesToOverlap;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ViewFinder")
 	TObjectPtr<UStaticMeshComponent> StaticMesh;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ViewFinder")
