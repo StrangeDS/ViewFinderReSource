@@ -43,7 +43,7 @@ protected:
 	float AspectRatio = 16.0f / 9;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ViewFinder")
-	float StartDis = 10.0f;
+	float StartDis = 20.0f;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ViewFinder")
 	float EndDis = 1000.0f;

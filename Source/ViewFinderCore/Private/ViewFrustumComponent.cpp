@@ -4,6 +4,7 @@
 
 UViewFrustumComponent::UViewFrustumComponent()
 {
+    SetComplexAsSimpleCollisionEnabled(false);
 }
 
 // 默认实现: 从简单盒上修改点位置.

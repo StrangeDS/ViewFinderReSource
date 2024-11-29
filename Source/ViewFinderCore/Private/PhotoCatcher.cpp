@@ -20,12 +20,14 @@ APhotoCatcher::APhotoCatcher()
 	PhotoCapture->SetupAttachment(RootComponent);
 	ViewFrustum = CreateDefaultSubobject<UViewFrustumComponent>(TEXT("ViewFrustum"));
 	ViewFrustum->SetupAttachment(RootComponent);
+	
 }
 
 void APhotoCatcher::OnConstruction(const FTransform &Transform)
 {
 	Super::OnConstruction(Transform);
 
+	ActorsToIgnore.AddUnique(this);
 	ViewFrustum->RegenerateViewFrustum(ViewAngle, AspectRatio, StartDis, EndDis);
 	// TODO: Sync PhotoCapture.
 }
@@ -67,6 +69,6 @@ void APhotoCatcher::TakeAPhoto_Implementation()
 		ActorsToIgnore,
 		OverlapComps);
 	UE_LOG(LogTemp, Warning, TEXT("TakeAPhoto_Implementation overlaps %i"), OverlapComps.Num());
-	TArray<UVFDynamicMeshComponent *> VFDMComps = UViewFinderFunctions::CheckVFDMComps(OverlapComps);
-	TArray<AActor *> Copied = UViewFinderFunctions::CopyActorFromVFDMComps(VFDMComps);
+	// TArray<UVFDynamicMeshComponent *> VFDMComps = UViewFinderFunctions::CheckVFDMComps(OverlapComps);
+	// TArray<AActor *> Copied = UViewFinderFunctions::CopyActorFromVFDMComps(VFDMComps);
 }

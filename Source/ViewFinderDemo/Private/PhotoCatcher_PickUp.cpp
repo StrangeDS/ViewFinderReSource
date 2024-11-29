@@ -20,7 +20,7 @@ void APhotoCatcher_PickUp::PickUp_Implementation(USceneComponent* ToAttach)
         return;
 
     AttachToComponent(ToAttach, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-    RootComponent->SetRelativeLocation(FVector(10.0f, 10.0f, 10.0f)); // 用于测试
+    RootComponent->SetRelativeLocation(FVector(10.0f, 20.0f, 0.0f)); // 用于测试
 
     if (HoldingMappingContext) {
 		auto Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer());

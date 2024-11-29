@@ -8,14 +8,13 @@
 
 #include "ViewFrustumComponent.generated.h"
 
-
 UCLASS(Blueprintable, ClassGroup = (ViewFinder), meta = (BlueprintSpawnableComponent))
 class VIEWFINDERCORE_API UViewFrustumComponent : public UDynamicMeshComponent
 {
 	GENERATED_BODY()
 
 	UViewFrustumComponent();
-	
+
 public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	void GenerateViewFrustum(float Angle, float AspectRatio, float StartDis, float EndDis);
@@ -27,11 +26,21 @@ public:
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ViewFinder")
-    FGeometryScriptPrimitiveOptions PrimitiveOptions;
-	
+	FGeometryScriptPrimitiveOptions PrimitiveOptions{
+		EGeometryScriptPrimitivePolygroupMode::SingleGroup};
+
+	// 重点在于: 凸包生成, 面数, 不要识别为基础形状.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ViewFinder")
-    FGeometryScriptCollisionFromMeshOptions CollisionOptions;
-	
+	FGeometryScriptCollisionFromMeshOptions CollisionOptions{
+		false,
+		EGeometryScriptCollisionGenerationMethod::ConvexHulls,
+		false,
+		false,
+		false,
+		1.0,
+		true,
+		6};
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ViewFinder")
 	TObjectPtr<UMaterialInterface> Matirial;
 };
