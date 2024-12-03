@@ -34,6 +34,11 @@ UDynamicMesh *UDynamicMeshPoolWorldSubsystem::RequestPlacingMesh(UPrimitiveCompo
     return Mesh;
 }
 
+void UDynamicMeshPoolWorldSubsystem::ReturnPlacingMesh(UDynamicMesh* DynamicMesh)
+{
+    PlacingPool->ReturnMesh(DynamicMesh);
+}
+
 // 基于UDynamicMeshPool::RequestMesh()，但其中有1000的默认上限，超出上限会将池中所有回收。
 UDynamicMesh *UDynamicMeshPoolWorldSubsystem::RequestComputingMesh(UPrimitiveComponent *PromitiveComponent)
 {
@@ -57,4 +62,9 @@ UDynamicMesh *UDynamicMeshPoolWorldSubsystem::RequestComputingMesh(UPrimitiveCom
     }
 
     return Mesh;
+}
+
+void UDynamicMeshPoolWorldSubsystem::ReturnComputingMesh(UDynamicMesh* DynamicMesh)
+{
+    ComputingPool->ReturnMesh(DynamicMesh);
 }

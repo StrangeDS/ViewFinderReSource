@@ -2,6 +2,9 @@
 
 #include "CoreMinimal.h"
 #include "Components/DynamicMeshComponent.h"
+
+#include "DynamicMeshPoolWorldSubsystem.h"
+
 #include "VFDynamicMeshComponent.generated.h"
 
 UCLASS(Blueprintable, ClassGroup = (ViewFinder), meta = (BlueprintSpawnableComponent))
@@ -10,6 +13,12 @@ class VIEWFINDERCORE_API UVFDynamicMeshComponent : public UDynamicMeshComponent
 	GENERATED_BODY()
 
 	UVFDynamicMeshComponent(const FObjectInitializer& ObjectInitializer);
+
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+
+public:
+	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
+	void SetDynamicMeshFromPool(UDynamicMesh *Mesh, ViewFinder::EMeshType Type);
 
 	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
 	bool HasSourceComponent();
@@ -21,6 +30,9 @@ class VIEWFINDERCORE_API UVFDynamicMeshComponent : public UDynamicMeshComponent
 	void SetSourceComponent(UPrimitiveComponent* PrimitiveComponent);
 
 protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "ViewFinder")
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "ViewFinder")
+	TEnumAsByte<ViewFinder::EMeshType> MeshType = ViewFinder::None;
+
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "ViewFinder")
 	TObjectPtr<UPrimitiveComponent> SourceComponent;
 };

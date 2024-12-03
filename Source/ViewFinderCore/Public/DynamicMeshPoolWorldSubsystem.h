@@ -7,6 +7,17 @@
 
 #include "DynamicMeshPoolWorldSubsystem.generated.h"
 
+UENUM(BlueprintType)
+namespace ViewFinder
+{
+	enum EMeshType : uint8
+	{
+		None = 0,
+		Placing,
+		Computing
+	};
+}
+
 UCLASS(Blueprintable, ClassGroup = (ViewFinder))
 class VIEWFINDERCORE_API UDynamicMeshPoolWorldSubsystem : public UWorldSubsystem
 {
@@ -16,15 +27,21 @@ class VIEWFINDERCORE_API UDynamicMeshPoolWorldSubsystem : public UWorldSubsystem
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
-	UDynamicMesh* RequestPlacingMesh(UPrimitiveComponent* PrimitiveComponent);
+	UDynamicMesh *RequestPlacingMesh(UPrimitiveComponent *PrimitiveComponent);
 
 	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
-	UDynamicMesh* RequestComputingMesh(UPrimitiveComponent* PrimitiveComponent = nullptr);
-	
+	void ReturnPlacingMesh(UDynamicMesh *DynamicMesh);
+
+	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
+	UDynamicMesh *RequestComputingMesh(UPrimitiveComponent *PrimitiveComponent = nullptr);
+
+	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
+	void ReturnComputingMesh(UDynamicMesh *DynamicMesh);
+
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ViewFinder")
 	TObjectPtr<UDynamicMeshPool> PlacingPool;
-	
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ViewFinder")
 	TObjectPtr<UDynamicMeshPool> ComputingPool;
 };

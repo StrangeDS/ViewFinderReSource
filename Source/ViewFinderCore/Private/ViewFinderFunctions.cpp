@@ -231,7 +231,7 @@ UVFDynamicMeshComponent *UViewFinderFunctions::CreateVFDMComponent(UObject *Oute
 	{
 		// 复制网格
 		UDynamicMesh *DynamicMesh = PoolSystem->RequestPlacingMesh(Template);
-		VFDMComp->SetDynamicMesh(DynamicMesh);
+		VFDMComp->SetDynamicMeshFromPool(DynamicMesh, ViewFinder::Placing);
 
 		// 复制碰撞预设, 类型等. 原静态网格体的简单碰撞可能与显示不一致, 自动生成的碰撞并不完美(以及不能智能地选择生成碰撞的设置).
 		VFDMComp->SetCollisionProfileName(Template->GetCollisionProfileName());
@@ -306,6 +306,23 @@ TArray<UVFDynamicMeshComponent *> UViewFinderFunctions::CheckVFDMComps(const TAr
 		}
 	}
 	return Result;
+}
+
+bool UViewFinderFunctions::CloneVFDMCompMesh(UVFDynamicMeshComponent *From, UVFDynamicMeshComponent *To)
+{
+	FTransform WorldTrans;
+    EGeometryScriptOutcomePins CopyResult;
+    UGeometryScriptLibrary_SceneUtilityFunctions::CopyMeshFromComponent(
+        From,
+        To->GetDynamicMesh(),
+        FGeometryScriptCopyMeshFromComponentOptions(),
+        true,
+        WorldTrans,
+        CopyResult,
+        nullptr);
+		
+	bool Result = CopyResult == EGeometryScriptOutcomePins::Success;
+    return Result;
 }
 
 TArray<AActor *> UViewFinderFunctions::CopyActorFromVFDMComps(const TArray<UVFDynamicMeshComponent *> &Components)

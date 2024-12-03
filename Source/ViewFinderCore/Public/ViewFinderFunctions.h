@@ -43,6 +43,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
 	static TArray<UVFDynamicMeshComponent *> CheckVFDMComps(const TArray<UPrimitiveComponent *> &Components);
 
+	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
+	static bool CloneVFDMCompMesh(UVFDynamicMeshComponent *From, UVFDynamicMeshComponent *To);
+
 	/// @brief 复制VFDMComp列表的Actor
 	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
 	static TArray<AActor *> CopyActorFromVFDMComps(const TArray<UVFDynamicMeshComponent *> &Components);
