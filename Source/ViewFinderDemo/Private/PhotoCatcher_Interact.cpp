@@ -15,7 +15,7 @@ bool APhotoCatcher_Interact::StartAiming_Implementation(APlayerController *Contr
 	if (AimingMappingContext)
 	{
 		// 具体事件的BindAction放在蓝图中进行(图个方便)
-		auto Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer());
+		auto Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(Controller->GetLocalPlayer());
 		if (Subsystem)
 			Subsystem->AddMappingContext(AimingMappingContext, 1);
 	}
@@ -29,7 +29,7 @@ bool APhotoCatcher_Interact::EndAiming_Implementation(APlayerController *Control
 
 	if (AimingMappingContext)
 	{
-		auto Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer());
+		auto Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(Controller->GetLocalPlayer());
 		if (Subsystem)
 			Subsystem->RemoveMappingContext(AimingMappingContext);
 	}
@@ -38,8 +38,7 @@ bool APhotoCatcher_Interact::EndAiming_Implementation(APlayerController *Control
 
 bool APhotoCatcher_Interact::Interact_Implementation(APlayerController *Controller)
 {
-	TakeAPhoto();
-	return true;
+	return false;
 }
 
 bool APhotoCatcher_Interact::IsEnabled_Implementation(APlayerController *Controller)
@@ -71,8 +70,6 @@ void APhotoCatcher_Interact::CloseToPreview_Implementation()
 		return;
 	}
 
-	GetWorldTimerManager().SetTimer(PreviewTimeHanlde, [this]()
-									{ bReady = true; }, TimeOfClose, false);
 	Pawn->DisableInput(PlayerController);
 	PlayerController->SetViewTargetWithBlend(this, TimeOfClose);
 }
@@ -85,8 +82,6 @@ void APhotoCatcher_Interact::LeaveFromPreview_Implementation()
 		return;
 	}
 
-	PreviewTimeHanlde.Invalidate();
-	bReady = false;
 	PlayerController->SetViewTargetWithBlend(Pawn, TimeOfLeave);
 	Pawn->EnableInput(PlayerController);
 }

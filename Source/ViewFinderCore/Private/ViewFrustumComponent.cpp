@@ -7,6 +7,13 @@ UViewFrustumComponent::UViewFrustumComponent()
     SetComplexAsSimpleCollisionEnabled(false);
 }
 
+void UViewFrustumComponent::BeginPlay()
+{
+    Super::BeginPlay();
+
+    SetHiddenInGame(true);
+}
+
 // 默认实现: 从简单盒上修改点位置.
 void UViewFrustumComponent::GenerateViewFrustum_Implementation(float Angle, float AspectRatio, float StartDis, float EndDis)
 {

@@ -16,12 +16,15 @@ class VIEWFINDERCORE_API UViewFrustumComponent : public UDynamicMeshComponent
 	UViewFrustumComponent();
 
 public:
+	void BeginPlay() override;
+
+public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	void GenerateViewFrustum(float Angle, float AspectRatio, float StartDis, float EndDis);
 	virtual void GenerateViewFrustum_Implementation(float Angle, float AspectRatio, float StartDis, float EndDis);
 
 	// 需要在Actor的construction中调用
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
 	void RegenerateViewFrustum(float Angle = 90.f, float AspectRatio = 1.77778f, float StartDis = 10.0f, float EndDis = 500.0f);
 
 protected:

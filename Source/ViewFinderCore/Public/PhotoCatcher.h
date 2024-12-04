@@ -29,11 +29,12 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 public:
-
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ViewFinder")
 	void TakeAPhoto();
 	virtual void TakeAPhoto_Implementation();
 
+	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
+	void SetViewFrustumVisible(const bool &Visibility);
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ViewFinder")
@@ -51,6 +52,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ViewFinder")
 	TArray<TObjectPtr<AActor>> ActorsToIgnore;
 
+	// 最好指定层级, 避免overlap到人物自身等情况.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ViewFinder")
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypesToOverlap;
 

@@ -12,6 +12,12 @@ class VIEWFINDERDEMO_API APhotoCatcher_PickUp : public APhotoCatcher_Interact
 public:
 	virtual bool Interact_Implementation(APlayerController* Controller) override;
 
+	virtual void TakeAPhoto_Implementation() override;
+	
+	virtual void CloseToPreview_Implementation() override;
+	
+	virtual void LeaveFromPreview_Implementation() override;
+
 public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ViewFinder")
 	void PickUp(USceneComponent* ToAttach);
@@ -27,4 +33,10 @@ protected:
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "ViewFinder")
 	bool bPickedUp = false;
+
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "ViewFinder")
+	bool bReady = false;
+
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "ViewFinder")
+	FTimerHandle PreviewTimeHanlde;
 };

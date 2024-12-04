@@ -49,9 +49,6 @@ protected:
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "ViewFinder")
 	TObjectPtr<UUserWidget> AimingHintUMG;
 
-	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "ViewFinder")
-	bool bReady = false;
-
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ViewFinder")
 	float TimeOfClose = 0.5f;
 
@@ -60,9 +57,6 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ViewFinder")
 	class UInputMappingContext *AimingMappingContext;
-
-	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "ViewFinder")
-	FTimerHandle PreviewTimeHanlde;
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "ViewFinder")
 	TObjectPtr<APawn> Pawn;

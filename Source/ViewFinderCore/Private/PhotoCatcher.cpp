@@ -51,6 +51,8 @@ void APhotoCatcher::OnConstruction(const FTransform &Transform)
 void APhotoCatcher::BeginPlay()
 {
 	Super::BeginPlay();
+
+	SetViewFrustumVisible(false);
 }
 
 void APhotoCatcher::Tick(float DeltaTime)
@@ -71,4 +73,10 @@ void APhotoCatcher::TakeAPhoto_Implementation()
 	UE_LOG(LogTemp, Warning, TEXT("TakeAPhoto_Implementation overlaps %i"), OverlapComps.Num());
 	// TArray<UVFDynamicMeshComponent *> VFDMComps = UViewFinderFunctions::CheckVFDMComps(OverlapComps);
 	// TArray<AActor *> Copied = UViewFinderFunctions::CopyActorFromVFDMComps(VFDMComps);
+}
+
+void APhotoCatcher::SetViewFrustumVisible(const bool &Visibility)
+{
+	check(ViewFrustum);
+	ViewFrustum->SetHiddenInGame(!Visibility);
 }
