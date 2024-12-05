@@ -6,6 +6,7 @@
 bool APhotoCatcher_PickUp::Interact_Implementation(APlayerController *Controller)
 {
     EnableInteract(false);
+    Execute_EndAiming(this, Controller);
     PlayerController = Controller;
     Pawn = PlayerController->GetPawn();
     // 需要根据角色重写
