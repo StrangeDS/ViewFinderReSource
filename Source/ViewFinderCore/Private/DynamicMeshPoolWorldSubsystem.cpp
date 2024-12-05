@@ -10,16 +10,16 @@ UDynamicMeshPoolWorldSubsystem::UDynamicMeshPoolWorldSubsystem()
 }
 
 // 基于UDynamicMeshPool::RequestMesh()，但其中有1000的默认上限，超出上限会将池中所有回收。
-UDynamicMesh *UDynamicMeshPoolWorldSubsystem::RequestPlacingMesh(UPrimitiveComponent *PromitiveComponent)
+UDynamicMesh *UDynamicMeshPoolWorldSubsystem::RequestPlacingMesh(UPrimitiveComponent *PrimitiveComponent)
 {
-    if (!PromitiveComponent) return nullptr;
+    if (!PrimitiveComponent) return nullptr;
 
     UDynamicMesh *Mesh = PlacingPool->RequestMesh();
 
     FTransform WorldTrans;
     EGeometryScriptOutcomePins CopyResult;
     UGeometryScriptLibrary_SceneUtilityFunctions::CopyMeshFromComponent(
-        PromitiveComponent,
+        PrimitiveComponent,
         Mesh,
         FGeometryScriptCopyMeshFromComponentOptions(),
         true,
@@ -40,16 +40,16 @@ void UDynamicMeshPoolWorldSubsystem::ReturnPlacingMesh(UDynamicMesh* DynamicMesh
 }
 
 // 基于UDynamicMeshPool::RequestMesh()，但其中有1000的默认上限，超出上限会将池中所有回收。
-UDynamicMesh *UDynamicMeshPoolWorldSubsystem::RequestComputingMesh(UPrimitiveComponent *PromitiveComponent)
+UDynamicMesh *UDynamicMeshPoolWorldSubsystem::RequestComputingMesh(UPrimitiveComponent *PrimitiveComponent)
 {
     UDynamicMesh *Mesh = ComputingPool->RequestMesh();
-    if (!PromitiveComponent)
+    if (!PrimitiveComponent)
         return Mesh;
 
     FTransform WorldTrans;
     EGeometryScriptOutcomePins CopyResult;
     UGeometryScriptLibrary_SceneUtilityFunctions::CopyMeshFromComponent(
-        PromitiveComponent,
+        PrimitiveComponent,
         Mesh,
         FGeometryScriptCopyMeshFromComponentOptions(),
         true,
@@ -58,7 +58,7 @@ UDynamicMesh *UDynamicMeshPoolWorldSubsystem::RequestComputingMesh(UPrimitiveCom
         nullptr);
 
     if (CopyResult == EGeometryScriptOutcomePins::Failure) {
-        UE_LOG(LogTemp, Warning, TEXT("UDynamicMeshPoolWorldSubsystem::RequestMesh() fails to copy."));
+        UE_LOG(LogTemp, Warning, TEXT("UDynamicMeshPoolWorldSubsystem::RequestMesh() fails to copy %s."), *PrimitiveComponent->GetName());
     }
 
     return Mesh;

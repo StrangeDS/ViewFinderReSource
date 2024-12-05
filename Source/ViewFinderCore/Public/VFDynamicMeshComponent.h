@@ -18,7 +18,7 @@ class VIEWFINDERCORE_API UVFDynamicMeshComponent : public UDynamicMeshComponent
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
-	void SetDynamicMeshFromPool(UDynamicMesh *Mesh, ViewFinder::EMeshType Type);
+	void SetDynamicMeshFromPool(UDynamicMesh *Mesh, EVF_MeshType Type);
 
 	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
 	bool HasSourceComponent();
@@ -31,7 +31,7 @@ public:
 
 protected:
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "ViewFinder")
-	TEnumAsByte<ViewFinder::EMeshType> MeshType = ViewFinder::None;
+	EVF_MeshType MeshType = EVF_MeshType::None;
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "ViewFinder")
 	TObjectPtr<UPrimitiveComponent> SourceComponent;

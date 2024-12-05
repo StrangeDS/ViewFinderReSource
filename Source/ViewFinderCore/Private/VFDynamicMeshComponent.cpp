@@ -26,7 +26,7 @@ void UVFDynamicMeshComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
     Super::EndPlay(EndPlayReason);
 }
 
-void UVFDynamicMeshComponent::SetDynamicMeshFromPool(UDynamicMesh *Mesh, ViewFinder::EMeshType Type)
+void UVFDynamicMeshComponent::SetDynamicMeshFromPool(UDynamicMesh *Mesh, EVF_MeshType Type)
 {
     MeshType = Type;
     SetDynamicMesh(Mesh);

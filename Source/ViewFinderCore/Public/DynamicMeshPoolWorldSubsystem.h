@@ -8,15 +8,12 @@
 #include "DynamicMeshPoolWorldSubsystem.generated.h"
 
 UENUM(BlueprintType)
-namespace ViewFinder
+enum class EVF_MeshType : uint8
 {
-	enum EMeshType : uint8
-	{
-		None = 0,
-		Placing,
-		Computing
-	};
-}
+	None = 0,
+	Placing,
+	Computing
+};
 
 UCLASS(Blueprintable, ClassGroup = (ViewFinder))
 class VIEWFINDERCORE_API UDynamicMeshPoolWorldSubsystem : public UWorldSubsystem
