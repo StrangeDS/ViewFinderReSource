@@ -6,29 +6,30 @@
 
 UVFDynamicMeshComponent::UVFDynamicMeshComponent(const FObjectInitializer &ObjectInitializer)
 {
+    SetMobility(EComponentMobility::Movable);
 }
 
 void UVFDynamicMeshComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-    auto PoolSystem = GetWorld()->GetSubsystem<UDynamicMeshPoolWorldSubsystem>();
-    check(PoolSystem);
-    switch (MeshType)
-    {
-    case ViewFinder::Placing:
-        PoolSystem->ReturnPlacingMesh(MeshObject);
-        break;
-    case ViewFinder::Computing:
-        PoolSystem->ReturnComputingMesh(MeshObject);
-        break;
-    case ViewFinder::None:
-    default:
-        break;
-    }
+    // auto PoolSystem = GetWorld()->GetSubsystem<UVFDynamicMeshPoolWorldSubsystem>();
+    // check(PoolSystem);
+    // switch (MeshType)
+    // {
+    // case ViewFinder::Placing:
+    //     if (MeshObject) PoolSystem->ReturnPlacingMesh(MeshObject);
+    //     break;
+    // case ViewFinder::Computing:
+    //     if (MeshObject) PoolSystem->ReturnComputingMesh(MeshObject);
+    //     break;
+    // case ViewFinder::None:
+    // default:
+    //     break;
+    // }
 
     Super::EndPlay(EndPlayReason);
 }
 
-void UVFDynamicMeshComponent::SetDynamicMeshFromPool(UDynamicMesh *Mesh, EVF_MeshType Type)
+void UVFDynamicMeshComponent::SetDynamicMeshFromPool(UDynamicMesh *Mesh, EVFMeshType Type)
 {
     MeshType = Type;
     SetDynamicMesh(Mesh);

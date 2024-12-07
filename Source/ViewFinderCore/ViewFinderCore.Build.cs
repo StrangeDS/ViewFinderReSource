@@ -12,9 +12,10 @@ public class ViewFinderCore : ModuleRules
 			new string[]
 			{
 				"Core",
+				"PhysicsCore",
 				"GeometryCore",
-				"DynamicMesh",
-				"PhysicsCore"
+				"GeometryFramework",
+				"DynamicMesh"
 			});
 
 		PrivateDependencyModuleNames.AddRange(

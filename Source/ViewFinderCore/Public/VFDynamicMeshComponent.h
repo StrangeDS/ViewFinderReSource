@@ -3,7 +3,7 @@
 #include "CoreMinimal.h"
 #include "Components/DynamicMeshComponent.h"
 
-#include "DynamicMeshPoolWorldSubsystem.h"
+#include "VFDynamicMeshPoolWorldSubsystem.h"
 
 #include "VFDynamicMeshComponent.generated.h"
 
@@ -18,7 +18,7 @@ class VIEWFINDERCORE_API UVFDynamicMeshComponent : public UDynamicMeshComponent
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
-	void SetDynamicMeshFromPool(UDynamicMesh *Mesh, EVF_MeshType Type);
+	void SetDynamicMeshFromPool(UDynamicMesh *Mesh, EVFMeshType Type);
 
 	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
 	virtual void CopyMeshFromComponent(UPrimitiveComponent* Source);
@@ -34,7 +34,7 @@ public:	// SourceComponent
 
 protected:
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "ViewFinder")
-	EVF_MeshType MeshType = EVF_MeshType::None;
+	EVFMeshType MeshType = EVFMeshType::None;
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "ViewFinder")
 	TObjectPtr<UPrimitiveComponent> SourceComponent;
