@@ -29,18 +29,5 @@
 				"ViewFinderCore"
 			]
 		}
-	],
-	"Plugins": [
-		{
-			"Name": "ModelingToolsEditorMode",
-			"Enabled": true,
-			"TargetAllowList": [
-				"Editor"
-			]
-		},
-		{
-			"Name": "GeometryScripting",
-			"Enabled": true
-		}
 	]
 }

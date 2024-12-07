@@ -12,17 +12,26 @@ public class ViewFinderCore : ModuleRules
 			new string[]
 			{
 				"Core",
-				"CoreUObject",
-				"Engine",
-				"InputCore",
-				"EnhancedInput",
 				"GeometryCore",
-				"GeometryScriptingCore",
-				"UMG"
+				"DynamicMesh",
+				"PhysicsCore"
+			});
+
+		PrivateDependencyModuleNames.AddRange(
+			new string[]
+			{
+				"CoreUObject",
+				"MeshConversionEngineTypes",
+				"ModelingComponents"
 			});
 
 		PublicIncludePaths.AddRange(new string[] { "ViewFinderCore/Public" });
 
 		PrivateIncludePaths.AddRange(new string[] { "ViewFinderCore/Private" });
+		
+		if (Target.bBuildEditor == true)
+		{
+			PrivateDependencyModuleNames.Add("UnrealEd");
+		}
 	}
 }

@@ -1,7 +1,6 @@
 #include "DynamicMeshPoolWorldSubsystem.h"
 
-#include "GeometryScript/GeometryScriptTypes.h"
-#include "GeometryScript/SceneUtilityFunctions.h"
+#include "VFGeometryFunctions.h"
 
 UDynamicMeshPoolWorldSubsystem::UDynamicMeshPoolWorldSubsystem()
 {
@@ -16,20 +15,11 @@ UDynamicMesh *UDynamicMeshPoolWorldSubsystem::RequestPlacingMesh(UPrimitiveCompo
 
     UDynamicMesh *Mesh = PlacingPool->RequestMesh();
 
-    FTransform WorldTrans;
-    EGeometryScriptOutcomePins CopyResult;
-    UGeometryScriptLibrary_SceneUtilityFunctions::CopyMeshFromComponent(
+    UVFGeometryFunctions::CopyMeshFromComponent(
         PrimitiveComponent,
         Mesh,
-        FGeometryScriptCopyMeshFromComponentOptions(),
-        true,
-        WorldTrans,
-        CopyResult,
-        nullptr);
-
-    if (CopyResult == EGeometryScriptOutcomePins::Failure) {
-        UE_LOG(LogTemp, Warning, TEXT("UDynamicMeshPoolWorldSubsystem::RequestMesh() fails to copy."));
-    }
+        FVF_GeometryScriptCopyMeshFromComponentOptions(),
+        true);
 
     return Mesh;
 }
@@ -46,20 +36,11 @@ UDynamicMesh *UDynamicMeshPoolWorldSubsystem::RequestComputingMesh(UPrimitiveCom
     if (!PrimitiveComponent)
         return Mesh;
 
-    FTransform WorldTrans;
-    EGeometryScriptOutcomePins CopyResult;
-    UGeometryScriptLibrary_SceneUtilityFunctions::CopyMeshFromComponent(
+    UVFGeometryFunctions::CopyMeshFromComponent(
         PrimitiveComponent,
         Mesh,
-        FGeometryScriptCopyMeshFromComponentOptions(),
-        true,
-        WorldTrans,
-        CopyResult,
-        nullptr);
-
-    if (CopyResult == EGeometryScriptOutcomePins::Failure) {
-        UE_LOG(LogTemp, Warning, TEXT("UDynamicMeshPoolWorldSubsystem::RequestMesh() fails to copy %s."), *PrimitiveComponent->GetName());
-    }
+        FVF_GeometryScriptCopyMeshFromComponentOptions(),
+        true);
 
     return Mesh;
 }

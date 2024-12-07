@@ -21,13 +21,16 @@ public:
 	void SetDynamicMeshFromPool(UDynamicMesh *Mesh, EVF_MeshType Type);
 
 	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
-	bool HasSourceComponent();
+	virtual void CopyMeshFromComponent(UPrimitiveComponent* Source);
 
+	void UpdateSimlpeCollision();
+
+public:	// SourceComponent
 	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
 	UPrimitiveComponent* GetSourceComponent();
-	
+
 	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
-	void SetSourceComponent(UPrimitiveComponent* PrimitiveComponent);
+	bool IsSourceVFDMComp();
 
 protected:
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "ViewFinder")

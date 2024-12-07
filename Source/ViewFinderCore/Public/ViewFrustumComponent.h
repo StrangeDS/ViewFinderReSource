@@ -3,8 +3,7 @@
 #include "CoreMinimal.h"
 #include "Components/DynamicMeshComponent.h"
 
-#include "GeometryScript/MeshPrimitiveFunctions.h"
-#include "GeometryScript/CollisionFunctions.h"
+#include "VFGeometryFunctions.h"
 
 #include "ViewFrustumComponent.generated.h"
 
@@ -29,14 +28,14 @@ public:
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ViewFinder")
-	FGeometryScriptPrimitiveOptions PrimitiveOptions{
-		EGeometryScriptPrimitivePolygroupMode::SingleGroup};
+	FVF_GeometryScriptPrimitiveOptions PrimitiveOptions{
+		EVF_GeometryScriptPrimitivePolygroupMode::SingleGroup};
 
 	// 重点在于: 凸包生成, 面数, 不要识别为基础形状.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ViewFinder")
-	FGeometryScriptCollisionFromMeshOptions CollisionOptions{
+	FVF_GeometryScriptCollisionFromMeshOptions CollisionOptions{
 		false,
-		EGeometryScriptCollisionGenerationMethod::ConvexHulls,
+		EVF_GeometryScriptCollisionGenerationMethod::ConvexHulls,
 		false,
 		false,
 		false,
