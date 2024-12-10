@@ -27,7 +27,7 @@ public:
 	void RegenerateViewFrustum(float Angle = 90.f, float AspectRatio = 1.77778f, float StartDis = 10.0f, float EndDis = 500.0f);
 
 	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
-	void CopyViewFrustum(UVFViewFrustumComponent* Other);
+	void RecordViewFrustum(UVFViewFrustumComponent* Other);
 	
 	// UFUNCTION(BlueprintCallable, Category = "ViewFinder")
 	// void GetOverlapedPrimitiveComps(TArray<UPrimitiveComponent*> Out);

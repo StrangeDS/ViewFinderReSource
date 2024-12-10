@@ -123,6 +123,11 @@ void AVFPhoto3D::PlaceDown()
 	}
 }
 
+void AVFPhoto3D::SetViewFrustumVisible(const bool &Visiblity)
+{
+	ViewFrustumRecorder->SetHiddenInGame(!Visiblity);
+}
+
 // void AVFPhoto3D::GetVFDMComps(TArray<UVFDynamicMeshComponent *> &Comps)
 // {
 // 	GetComponents<UVFDynamicMeshComponent>(Comps);
@@ -149,7 +154,7 @@ void AVFPhoto3D::RecordProperty(
 	bool OnlyWithHelps,
 	const TArray<TEnumAsByte<EObjectTypeQuery>> &ObjectTypes)
 {
-	ViewFrustumRecorder->CopyViewFrustum(ViewFrustum);
+	ViewFrustumRecorder->RecordViewFrustum(ViewFrustum);
 	bOnlyOverlapWithHelps = OnlyWithHelps;
 	ObjectTypesToOverlap = ObjectTypes;
 }

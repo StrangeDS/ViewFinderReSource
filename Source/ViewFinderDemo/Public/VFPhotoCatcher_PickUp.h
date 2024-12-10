@@ -38,5 +38,5 @@ protected:
 	bool bReady = false;
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "ViewFinder")
-	FTimerHandle PreviewTimeHanlde;
+	FTimerHandle PreviewTimeHandle;
 };

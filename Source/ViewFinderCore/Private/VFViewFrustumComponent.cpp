@@ -32,7 +32,7 @@ void UVFViewFrustumComponent::RegenerateViewFrustum(float Angle, float AspectRat
     GenerateViewFrustum(Angle, AspectRatio, StartDis, EndDis);
 }
 
-void UVFViewFrustumComponent::CopyViewFrustum(UVFViewFrustumComponent *Other)
+void UVFViewFrustumComponent::RecordViewFrustum(UVFViewFrustumComponent *Other)
 {
     UVFGeometryFunctions::CopyMeshFromComponent(
         Other,
@@ -40,9 +40,9 @@ void UVFViewFrustumComponent::CopyViewFrustum(UVFViewFrustumComponent *Other)
         FVF_GeometryScriptCopyMeshFromComponentOptions(),
         false);
 
+    // Necessary ?
 	SetCollisionProfileName(TEXT("ViewFrustum"));
     UVFGeometryFunctions::SetDynamicMeshCollisionFromMesh(MeshObject, this, CollisionOptions);
     SetComplexAsSimpleCollisionEnabled(false);
     SetCollisionEnabled(ECollisionEnabled::NoCollision);
-    // SetHiddenInGame(false);
 }

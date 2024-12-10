@@ -28,7 +28,7 @@ void AVFPhotoCatcher_PickUp::CloseToPreview_Implementation()
     Super::CloseToPreview_Implementation();
 
     GetWorldTimerManager().SetTimer(
-        PreviewTimeHanlde, [this]()
+        PreviewTimeHandle, [this]()
         {
             bReady = true;
             SetViewFrustumVisible(true);
@@ -41,7 +41,7 @@ void AVFPhotoCatcher_PickUp::LeaveFromPreview_Implementation()
 {
     Super::LeaveFromPreview_Implementation();
 
-    GetWorldTimerManager().ClearTimer(PreviewTimeHanlde);
+    GetWorldTimerManager().ClearTimer(PreviewTimeHandle);
     bReady = false;
     SetViewFrustumVisible(false);
 }

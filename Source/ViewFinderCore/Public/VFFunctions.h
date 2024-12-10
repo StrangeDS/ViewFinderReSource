@@ -50,7 +50,7 @@ public:
 	// 	TArray<UPrimitiveComponent *> &Components,
 	// 	TMap<UVFDynamicMeshComponent *, UVFHelperComponent *> &Map);
 
-	UFUNCTION(BlueprintCallable ,Category = "ViewFinder")
+	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
 	static void GetCompsToHelpersMapping(
 		UPARAM(ref) TArray<UVFDynamicMeshComponent *> &Components,
 		UPARAM(ref) TMap<UVFDynamicMeshComponent *, UVFHelperComponent *> &Map);
@@ -61,7 +61,10 @@ public:
 		UPARAM(ref) const TArray<UPrimitiveComponent *> &Components);
 
 	// UFUNCTION(BlueprintCallable, Category = "ViewFinder")
-	// static void PlaceAPhoto(AVFPhoto3D *Photo, FTransform WorldTrans);
+	// static void PlaceAPhoto(AVFPhoto3D *Photo, FTransform WorldTrans);.
+
+	// UFUNCTION(BlueprintCallable, Category = "ViewFinder")
+	// static AVFPhotoContainer *CreateAPhoto(UWorld *World, FTransform WorldTrans);
 
 public: // 网格布尔操作
 	UFUNCTION(BlueprintCallable, Category = "ViewFinder")

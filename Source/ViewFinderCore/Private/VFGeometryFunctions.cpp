@@ -188,7 +188,9 @@ UDynamicMesh *UVFGeometryFunctions::CopyMeshFromStaticMesh(
 	if (ensure(!FromStaticMeshAsset->bAllowCPUAccess))
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Mesh %s bAllowCPUAccess needs to be true."), *FromStaticMeshAsset->GetName());
+#if !WITH_EDITOR
 		return ToDynamicMesh;
+#endif
 	}
 
 	int32 UseLODIndex = FMath::Clamp(RequestedLOD.LODIndex, 0, FromStaticMeshAsset->GetNumLODs() - 1);
@@ -210,11 +212,8 @@ UDynamicMesh *UVFGeometryFunctions::CopyMeshFromStaticMesh(
 	FDynamicMesh3 NewMesh;
 	FStaticMeshLODResourcesToDynamicMesh Converter;
 	bool Result = Converter.Convert(LODResources, ConvertOptions, NewMesh);
-	if (!Result) 
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("UVFGeometryFunctions::CopyMeshFromStaticMesh() fails."));
-	else
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("UVFGeometryFunctions::CopyMeshFromStaticMesh() successes."));
-	
+	if (!Result)
+		UE_LOG(LogTemp, Warning, TEXT("UVFGeometryFunctions::CopyMeshFromStaticMesh() may Get something wrong at Converter."));
 
 	ToDynamicMesh->SetMesh(MoveTemp(NewMesh));
 	return ToDynamicMesh;
@@ -554,10 +553,7 @@ UDynamicMesh *UVFGeometryFunctions::CopyMeshFromComponent(
 	}
 
 	if (!bSuccess)
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("UVFGeometryFunctions::CopyMeshFromComponent() fails."));
-	else
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("UVFGeometryFunctions::CopyMeshFromComponent() successes."));
-
+		UE_LOG(LogTemp, Warning, TEXT("UVFGeometryFunctions::CopyMeshFromComponent() doesn't success."));
 
 	// transform mesh to world
 	if (bSuccess && bTransformToWorld)

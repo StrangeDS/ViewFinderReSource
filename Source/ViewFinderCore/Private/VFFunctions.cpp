@@ -12,6 +12,7 @@
 #include "VFPhoto3D.h"
 #include "VFViewFrustumComponent.h"
 #include "VFHelperComponent.h"
+#include "VFPhotoContainer.h"
 
 bool UVFFunctions::FrustumOverlapComponents(UPrimitiveComponent *Component, const FTransform &ComponentTransform, const TArray<TEnumAsByte<EObjectTypeQuery>> &ObjectTypes, UClass *ComponentClassFilter, const TArray<AActor *> &ActorsToIgnore, TArray<UPrimitiveComponent *> &OutComponents)
 {
@@ -255,6 +256,13 @@ AVFPhoto3D *UVFFunctions::TakeAPhoto(UVFViewFrustumComponent *ViewFrustum, const
 
 // void UVFFunctions::PlaceAPhoto(AVFPhoto3D *Photo, FTransform WorldTrans)
 // {
+// }
+
+// AVFPhotoContainer *UVFFunctions::CreateAPhoto(UWorld *World, TSubclassOf<AVFPhotoContainer> ActorClass, FTransform WorldTrans)
+// {
+// 	auto Container = GameplayStatics::GetActorOfClass(World, ActorClass);
+// 	check(Container);
+// 	return Container->CreateAPhoto(WorldTrans);
 // }
 
 void UVFFunctions::MeshBooleanIntersect(UDynamicMeshComponent *Target, UDynamicMeshComponent *Tool)
