@@ -54,7 +54,7 @@ void UVFDynamicMeshComponent::CopyMeshFromComponent(UPrimitiveComponent *Source)
     if (Source->BodyInstance.bSimulatePhysics)
     {
         // 生成简单碰撞模拟物理, 面数该如何抉择?
-        SetComplexAsSimpleCollisionEnabled(false, false);
+        SetComplexAsSimpleCollisionEnabled(false, true);
         UpdateSimlpeCollision();
         SetSimulatePhysics(Source->BodyInstance.bSimulatePhysics);
         SetEnableGravity(Source->IsGravityEnabled());
@@ -62,7 +62,7 @@ void UVFDynamicMeshComponent::CopyMeshFromComponent(UPrimitiveComponent *Source)
     else
     {
         // 使用复杂碰撞
-        SetComplexAsSimpleCollisionEnabled(true, false);
+        SetComplexAsSimpleCollisionEnabled(true, true);
     }
     SetCollisionEnabled(Source->GetCollisionEnabled());
 

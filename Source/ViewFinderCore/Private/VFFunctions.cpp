@@ -13,7 +13,6 @@
 #include "VFViewFrustumComponent.h"
 #include "VFHelperComponent.h"
 
-
 bool UVFFunctions::FrustumOverlapComponents(UPrimitiveComponent *Component, const FTransform &ComponentTransform, const TArray<TEnumAsByte<EObjectTypeQuery>> &ObjectTypes, UClass *ComponentClassFilter, const TArray<AActor *> &ActorsToIgnore, TArray<UPrimitiveComponent *> &OutComponents)
 {
 	OutComponents.Empty();
@@ -120,21 +119,15 @@ TArray<UVFDynamicMeshComponent *> UVFFunctions::CheckVFDMComps(const TArray<UPri
 				// 只挂载被包含的组件
 				if (Components.Contains(PrimComp))
 				{
-					// 不确定的: 额外处理VFDMComp被SMComp挤开的特殊情况
-					// bool bPhysics = PrimComp->BodyInstance.bSimulatePhysics;
-					// PrimComp->SetSimulatePhysics(false);
-
 					// UWorld *World = Actor->GetWorld();
 					// UVFDynamicMeshPoolWorldSubsystem *PoolSystem = World->GetSubsystem<UVFDynamicMeshPoolWorldSubsystem>();
 
-					// UVFDynamicMeshComponent *VFDMComp = CreateVFDMComponent(Actor, PrimComp);
 					UVFDynamicMeshComponent *VFDMComp = NewObject<UVFDynamicMeshComponent>(Actor);
 					VFDMComp->RegisterComponent();
 					VFDMComp->AttachToComponent(PrimComp, FAttachmentTransformRules::KeepWorldTransform);
 					Actor->AddInstanceComponent(VFDMComp);
 					VFDMComp->CopyMeshFromComponent(PrimComp);
 
-					// VFDMComp->SetSimulatePhysics(bPhysics);
 					Result.Add(VFDMComp);
 				}
 				PrimComp->SetSimulatePhysics(false);
@@ -198,17 +191,32 @@ TArray<AActor *> UVFFunctions::CopyActorFromVFDMComps(AVFPhoto3D *Photo, const T
 	{
 		Result.Emplace(Copied);
 	}
-	
+
 	return Result;
 }
 
-void UVFFunctions::FilterPrimCompsWithHelper(TArray<UPrimitiveComponent *> &Components)
+// void UVFFunctions::FilterPrimCompsWithHelper(
+// 	TArray<UPrimitiveComponent *> &Components,
+// 	TMap<UVFDynamicMeshComponent *, UVFHelperComponent *> &Map)
+// {
+// 	for (auto It = Components.CreateIterator(); It; It++)
+// 	{
+// 		auto Helper = (*It)->GetOwner()->GetComponentByClass<UVFHelperComponent>();
+// 		if (Helper && Helper->bCanBeTakenInPhoto)
+// 			Map.Add(*It, Helper);
+// 		else
+// 			It.RemoveCurrent();
+// 	}
+// }
+
+void UVFFunctions::GetCompsToHelpersMapping(
+	TArray<UVFDynamicMeshComponent *> &Components,
+	TMap<UVFDynamicMeshComponent *, UVFHelperComponent *> &Map)
 {
 	for (auto It = Components.CreateIterator(); It; It++)
 	{
 		auto Helper = (*It)->GetOwner()->GetComponentByClass<UVFHelperComponent>();
-		if (!Helper || !Helper->bCanBeTakenInPhoto)
-			It.RemoveCurrent();
+		Map.Add(*It, Helper);
 	}
 }
 
@@ -223,34 +231,21 @@ AVFPhoto3D *UVFFunctions::TakeAPhoto(UVFViewFrustumComponent *ViewFrustum, const
 	auto ActorsCopied = CopyActorFromVFDMComps(Photo, VFDMComps, CopiedComps);
 
 	{
-		check(VFDMComps.Num() == CopiedComps.Num()) int NumOfComps = VFDMComps.Num();
+		check(VFDMComps.Num() == CopiedComps.Num());
+		int NumOfComps = VFDMComps.Num();
 		UDynamicMesh *FrustumMesh = ViewFrustum->GetDynamicMesh();
 		FTransform FrustumTrans = ViewFrustum->GetComponentToWorld();
-		FVF_GeometryScriptMeshBooleanOptions Options;
 
-		for (int i = 0; i < NumOfComps; i++)
+		// 原网格, 与视锥求差
+		for (auto &Comp : VFDMComps)
 		{
-			// 复制出的网格, 与视锥求交集
-			// auto CopiedComp = CopiedComps[i];
-			// UVFGeometryFunctions::ApplyMeshBoolean(
-			// 	CopiedComp->GetDynamicMesh(),
-			// 	CopiedComp->GetComponentToWorld(),
-			// 	FrustumMesh,
-			// 	FrustumTrans,
-			// 	EVF_GeometryScriptBooleanOperation::Intersection,
-			// 	Options);
-			// CopiedComp->UpdateSimlpeCollision();
+			SubtractWithFrustum(Comp, ViewFrustum);
+		}
 
-			// 原网格, 与视锥求差
-			auto VFDMComp = VFDMComps[i];
-			UVFGeometryFunctions::ApplyMeshBoolean(
-				VFDMComp->GetDynamicMesh(),
-				VFDMComp->GetComponentToWorld(),
-				FrustumMesh,
-				FrustumTrans,
-				EVF_GeometryScriptBooleanOperation::Subtract,
-				Options);
-			VFDMComp->UpdateSimlpeCollision();
+		// 复制出的网格, 与视锥求交集
+		for (auto &Comp : CopiedComps)
+		{
+			IntersectWithFrustum(Comp, ViewFrustum);
 		}
 	}
 	Photo->FoldUp();
@@ -258,6 +253,42 @@ AVFPhoto3D *UVFFunctions::TakeAPhoto(UVFViewFrustumComponent *ViewFrustum, const
 	return Photo;
 }
 
-void UVFFunctions::PlaceAPhoto(AVFPhoto3D *Photo)
+// void UVFFunctions::PlaceAPhoto(AVFPhoto3D *Photo, FTransform WorldTrans)
+// {
+// }
+
+void UVFFunctions::MeshBooleanIntersect(UDynamicMeshComponent *Target, UDynamicMeshComponent *Tool)
 {
+	static FVF_GeometryScriptMeshBooleanOptions Options;
+	UVFGeometryFunctions::ApplyMeshBoolean(
+		Target->GetDynamicMesh(),
+		Target->GetComponentToWorld(),
+		Tool->GetDynamicMesh(),
+		Tool->GetComponentToWorld(),
+		EVF_GeometryScriptBooleanOperation::Intersection,
+		Options);
+}
+
+void UVFFunctions::MeshBooleanSubtract(UDynamicMeshComponent *Target, UDynamicMeshComponent *Tool)
+{
+	static FVF_GeometryScriptMeshBooleanOptions Options;
+	UVFGeometryFunctions::ApplyMeshBoolean(
+		Target->GetDynamicMesh(),
+		Target->GetComponentToWorld(),
+		Tool->GetDynamicMesh(),
+		Tool->GetComponentToWorld(),
+		EVF_GeometryScriptBooleanOperation::Subtract,
+		Options);
+}
+
+void UVFFunctions::IntersectWithFrustum(UVFDynamicMeshComponent *Target, UVFViewFrustumComponent *ViewFrustum)
+{
+	MeshBooleanIntersect(Target, ViewFrustum);
+	Target->UpdateSimlpeCollision();
+}
+
+void UVFFunctions::SubtractWithFrustum(UVFDynamicMeshComponent *Target, UVFViewFrustumComponent *ViewFrustum)
+{
+	MeshBooleanSubtract(Target, ViewFrustum);
+	Target->UpdateSimlpeCollision();
 }

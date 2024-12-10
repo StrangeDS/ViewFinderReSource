@@ -35,14 +35,15 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 public:
-	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
-	void FoldUp(const bool &NeedHide = true);
+	UFUNCTION(BlueprintCallable, CallInEditor, Category = "ViewFinder")
+	// void FoldUp(const bool &NeedHide = true);
+	void FoldUp();
 
-	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
-	void PlaceDown(FTransform Transform);
-
-	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
-	void GetVFDMComps(TArray<UVFDynamicMeshComponent *> &Comps);
+	UFUNCTION(BlueprintCallable, CallInEditor, Category = "ViewFinder")
+	void PlaceDown();
+	
+	// UFUNCTION(BlueprintCallable, Category = "ViewFinder")
+	// void GetVFDMComps(TArray<UVFDynamicMeshComponent *> &Comps);
 
 	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
 	void GetCaptured(USceneCaptureComponent2D *Capturer);
@@ -59,6 +60,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "ViewFinder")
 	TObjectPtr<UStaticMeshComponent> StaticMesh;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "ViewFinder")
+	TObjectPtr<UVFViewFrustumComponent> ViewFrustumRecorder;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ViewFinder")
 	TObjectPtr<UTextureRenderTarget2D> RenderTarget = nullptr;
@@ -69,6 +73,19 @@ protected:
 	// UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ViewFinder")
 	// TEnumAsByte<ETextureRenderTargetFormat> Format;
 
+	// UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "ViewFinder")
+	// TArray<TObjectPtr<UVFDynamicMeshComponent>> VFDMComps;
+
+public:	// 记录属性
+	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
+	void RecordProperty(
+		UVFViewFrustumComponent *ViewFrustum,
+		bool OnlyWithHelps,
+		const TArray<TEnumAsByte<EObjectTypeQuery>> &ObjectTypes);
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ViewFinder")
+	bool bOnlyOverlapWithHelps = false;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "ViewFinder")
-	TArray<TObjectPtr<UVFDynamicMeshComponent>> VFDMComps;
+	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypesToOverlap;
 };

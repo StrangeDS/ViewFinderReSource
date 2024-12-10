@@ -8,16 +8,16 @@
 #include "Components/MeshComponent.h"
 #include "Components/DynamicMeshComponent.h"
 #include "Components/BaseDynamicMeshComponent.h"
+#include "VFHelperComponent.h"
 
 #include "VFFunctions.generated.h"
 
-UCLASS(meta = (ScriptName = "ViewFinder"))
+UCLASS(meta = (ScriptName = "VFFunctions"))
 class VIEWFINDERCORE_API UVFFunctions : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 
 public:
-
 	// Need? from ComponentOverlapComponents() in KismetSystemLibrary(.h).
 	UFUNCTION(BlueprintCallable, Category = "ViewFinder", meta = (AutoCreateRefTerm = "ActorsToIgnore", DisplayName = "Frustum Overlap Components"))
 	static bool FrustumOverlapComponents(UPrimitiveComponent *Component, const FTransform &ComponentTransform, const TArray<TEnumAsByte<EObjectTypeQuery>> &ObjectTypes, UClass *ComponentClassFilter, const TArray<AActor *> &ActorsToIgnore, TArray<class UPrimitiveComponent *> &OutComponents);
@@ -40,14 +40,39 @@ public:
 
 	/// @brief 复制VFDMComp列表的Actor
 	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
-	static TArray<AActor *> CopyActorFromVFDMComps(AVFPhoto3D *Photo, const TArray<UVFDynamicMeshComponent *> &Components, TArray<UVFDynamicMeshComponent *> &CopiedComps);
+	static TArray<AActor *> CopyActorFromVFDMComps(
+		AVFPhoto3D *Photo,
+		UPARAM(ref) const TArray<UVFDynamicMeshComponent *> &Components,
+		UPARAM(ref) TArray<UVFDynamicMeshComponent *> &CopiedComps);
+
+	// UFUNCTION(BlueprintCallable, Category = "ViewFinder")
+	// static void FilterPrimCompsWithHelper(
+	// 	TArray<UPrimitiveComponent *> &Components,
+	// 	TMap<UVFDynamicMeshComponent *, UVFHelperComponent *> &Map);
+
+	UFUNCTION(BlueprintCallable ,Category = "ViewFinder")
+	static void GetCompsToHelpersMapping(
+		UPARAM(ref) TArray<UVFDynamicMeshComponent *> &Components,
+		UPARAM(ref) TMap<UVFDynamicMeshComponent *, UVFHelperComponent *> &Map);
 
 	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
-	static void FilterPrimCompsWithHelper(TArray<UPrimitiveComponent *> &Components);
+	static AVFPhoto3D *TakeAPhoto(
+		UVFViewFrustumComponent *ViewFrustum,
+		UPARAM(ref) const TArray<UPrimitiveComponent *> &Components);
+
+	// UFUNCTION(BlueprintCallable, Category = "ViewFinder")
+	// static void PlaceAPhoto(AVFPhoto3D *Photo, FTransform WorldTrans);
+
+public: // 网格布尔操作
+	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
+	static void MeshBooleanIntersect(UDynamicMeshComponent *Target, UDynamicMeshComponent *Tool);
 
 	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
-	static AVFPhoto3D *TakeAPhoto(UVFViewFrustumComponent *ViewFrustum, const TArray<UPrimitiveComponent *> &Components);
-	
+	static void MeshBooleanSubtract(UDynamicMeshComponent *Target, UDynamicMeshComponent *Tool);
+
 	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
-	static void PlaceAPhoto(AVFPhoto3D *Photo);
+	static void IntersectWithFrustum(UVFDynamicMeshComponent *Target, UVFViewFrustumComponent *ViewFrustum);
+
+	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
+	static void SubtractWithFrustum(UVFDynamicMeshComponent *Target, UVFViewFrustumComponent *ViewFrustum);
 };

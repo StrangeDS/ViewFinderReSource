@@ -52,7 +52,10 @@ protected:
 	float EndDis = 1000.0f;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ViewFinder")
-	bool OnlyOverlapWithHelps = false;
+	bool bOnlyOverlapWithHelps = false;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ViewFinder")
+	bool bCuttingSource = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ViewFinder")
 	TArray<TObjectPtr<AActor>> ActorsToIgnore;

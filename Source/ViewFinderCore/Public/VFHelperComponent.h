@@ -29,10 +29,14 @@ protected:
 public:	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-
 public:
+	// 能否被拍入照片
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ViewFinder")
 	bool bCanBeTakenInPhoto = false;
+	
+	// 能否被放置的照片覆盖(差集)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ViewFinder")
+	bool bCanBePlacedByPhoto = true;
 
 public:
 	// 动态多播

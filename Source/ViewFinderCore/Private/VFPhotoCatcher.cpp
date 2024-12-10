@@ -4,8 +4,9 @@
 
 #include "VFPhotoCaptureComponent.h"
 #include "VFDynamicMeshComponent.h"
-#include "VFFunctions.h"
+#include "VFPhoto3D.h"
 
+#include "VFFunctions.h"
 #include "Kismet/KismetSystemLibrary.h"
 
 AVFPhotoCatcher::AVFPhotoCatcher()
@@ -60,6 +61,7 @@ void AVFPhotoCatcher::Tick(float DeltaTime)
 
 void AVFPhotoCatcher::TakeAPhoto_Implementation()
 {
+	TRACE_CPUPROFILER_EVENT_SCOPE(TEXT("AVFPhotoCatcher::TakeAPhoto_Implementation()"));
 	TArray<UPrimitiveComponent *> OverlapComps;
 	UKismetSystemLibrary::ComponentOverlapComponents(
 		ViewFrustum,
@@ -68,13 +70,42 @@ void AVFPhotoCatcher::TakeAPhoto_Implementation()
 		UPrimitiveComponent::StaticClass(),
 		ActorsToIgnore,
 		OverlapComps);
-	
-	if (OnlyOverlapWithHelps)
-		UVFFunctions::FilterPrimCompsWithHelper(OverlapComps);
+	auto VFDMComps = UVFFunctions::CheckVFDMComps(OverlapComps);
 
+	TMap<UVFDynamicMeshComponent *, UVFHelperComponent *> HelperMap;
+	UVFFunctions::GetCompsToHelpersMapping(VFDMComps, HelperMap);
+	for (auto It = VFDMComps.CreateIterator(); It; It++)
+	{
+		auto Comp = *It;
+		auto Helper = HelperMap[Comp];
+		if (bOnlyOverlapWithHelps && !Helper)
+			It.RemoveCurrent();
+		else if (Helper && !HelperMap[Comp]->bCanBePlacedByPhoto)
+			It.RemoveCurrent();
+	}
 	UE_LOG(LogTemp, Warning, TEXT("TakeAPhoto_Implementation overlaps %i"), OverlapComps.Num());
 
-	AVFPhoto3D *Photo = UVFFunctions::TakeAPhoto(ViewFrustum, OverlapComps);
+	AVFPhoto3D *Photo = GetWorld()->SpawnActor<AVFPhoto3D>(
+		ViewFrustum->GetComponentLocation(),
+		ViewFrustum->GetComponentRotation());
+	TArray<UVFDynamicMeshComponent *> CopiedComps;
+	auto ActorsCopied = UVFFunctions::CopyActorFromVFDMComps(Photo, VFDMComps, CopiedComps);
+
+	if (bCuttingSource)
+	{
+		for (auto &Comp : VFDMComps)
+		{
+			UVFFunctions::SubtractWithFrustum(Comp, ViewFrustum);
+		}
+	}
+
+	for (auto &Comp : CopiedComps)
+	{
+		UVFFunctions::IntersectWithFrustum(Comp, ViewFrustum);
+	}
+	Photo->FoldUp();
+	Photo->RecordProperty(ViewFrustum, bOnlyOverlapWithHelps, ObjectTypesToOverlap);
+	// Photo->PlaceDown();
 }
 
 void AVFPhotoCatcher::SetViewFrustumVisible(const bool &Visibility)

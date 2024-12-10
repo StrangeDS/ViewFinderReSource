@@ -167,6 +167,7 @@ UDynamicMesh *UVFGeometryFunctions::SetDynamicMeshCollisionFromMesh(
 	return FromDynamicMesh;
 }
 
+#include "Engine/StaticMesh.h"
 #include "StaticMeshLODResourcesToDynamicMesh.h"
 
 UDynamicMesh *UVFGeometryFunctions::CopyMeshFromStaticMesh(
@@ -183,10 +184,14 @@ UDynamicMesh *UVFGeometryFunctions::CopyMeshFromStaticMesh(
 	check(
 		RequestedLOD.LODType == EVF_GeometryScriptLODType::MaxAvailable ||
 		RequestedLOD.LODType == EVF_GeometryScriptLODType::RenderData);
-#if !WITH_EDITOR
-	check(!FromStaticMeshAsset->bAllowCPUAccess);
-#endif
-	int32 UseLODIndex = FMath::Clamp(RequestedLOD.LODIndex, 0, FromStaticMeshAsset->GetNumSourceModels() - 1);
+
+	if (ensure(!FromStaticMeshAsset->bAllowCPUAccess))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Mesh %s bAllowCPUAccess needs to be true."), *FromStaticMeshAsset->GetName());
+		return ToDynamicMesh;
+	}
+
+	int32 UseLODIndex = FMath::Clamp(RequestedLOD.LODIndex, 0, FromStaticMeshAsset->GetNumLODs() - 1);
 
 	const FStaticMeshLODResources* LODResources = nullptr;
 	if (FStaticMeshRenderData* RenderData = FromStaticMeshAsset->GetRenderData())
@@ -204,7 +209,12 @@ UDynamicMesh *UVFGeometryFunctions::CopyMeshFromStaticMesh(
 
 	FDynamicMesh3 NewMesh;
 	FStaticMeshLODResourcesToDynamicMesh Converter;
-	Converter.Convert(LODResources, ConvertOptions, NewMesh);
+	bool Result = Converter.Convert(LODResources, ConvertOptions, NewMesh);
+	if (!Result) 
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("UVFGeometryFunctions::CopyMeshFromStaticMesh() fails."));
+	else
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("UVFGeometryFunctions::CopyMeshFromStaticMesh() successes."));
+	
 
 	ToDynamicMesh->SetMesh(MoveTemp(NewMesh));
 	return ToDynamicMesh;
@@ -413,7 +423,11 @@ UDynamicMesh *UVFGeometryFunctions::AppendFrustum(
 #include "ConversionUtils/SkinnedMeshToDynamicMesh.h"
 #include "ConversionUtils/SplineComponentDeformDynamicMesh.h"
 
-UDynamicMesh *UVFGeometryFunctions::CopyMeshFromComponent(UPrimitiveComponent *Component, UDynamicMesh *ToDynamicMesh, FVF_GeometryScriptCopyMeshFromComponentOptions Options, bool bTransformToWorld)
+UDynamicMesh *UVFGeometryFunctions::CopyMeshFromComponent(
+	UPrimitiveComponent *Component,
+	UDynamicMesh *ToDynamicMesh,
+	FVF_GeometryScriptCopyMeshFromComponentOptions Options,
+	bool bTransformToWorld)
 {
 	bool bSuccess = false;
 	FTransform LocalToWorld = FTransform::Identity;
@@ -538,6 +552,12 @@ UDynamicMesh *UVFGeometryFunctions::CopyMeshFromComponent(UPrimitiveComponent *C
 		ToDynamicMesh->SetMesh(MoveTemp(ConvertedMesh));
 		bSuccess = true;
 	}
+
+	if (!bSuccess)
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("UVFGeometryFunctions::CopyMeshFromComponent() fails."));
+	else
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::White, TEXT("UVFGeometryFunctions::CopyMeshFromComponent() successes."));
+
 
 	// transform mesh to world
 	if (bSuccess && bTransformToWorld)

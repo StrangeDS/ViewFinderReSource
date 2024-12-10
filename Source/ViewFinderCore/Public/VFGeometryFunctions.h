@@ -217,7 +217,7 @@ public:
 	FVF_GeometryScriptMeshReadLOD RequestedLOD = FVF_GeometryScriptMeshReadLOD();
 };
 
-UCLASS(meta = (ScriptName = "ViewFinder"))
+UCLASS(meta = (ScriptName = "VFGeometryFunctions"))
 class VIEWFINDERCORE_API UVFGeometryFunctions : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
