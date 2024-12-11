@@ -36,7 +36,6 @@ public:
 
 public:
 	UFUNCTION(BlueprintCallable, CallInEditor, Category = "ViewFinder")
-	// void FoldUp(const bool &NeedHide = true);
 	void FoldUp();
 
 	UFUNCTION(BlueprintCallable, CallInEditor, Category = "ViewFinder")
@@ -48,16 +47,7 @@ public:
 	// UFUNCTION(BlueprintCallable, Category = "ViewFinder")
 	// void GetVFDMComps(TArray<UVFDynamicMeshComponent *> &Comps);
 
-	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
-	void GetCaptured(USceneCaptureComponent2D *Capturer);
-
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ViewFinder")
-	int PixelNum = 1024;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ViewFinder")
-	FName TextureName = TEXT("Texture");
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ViewFinder")
 	EVF_PhotoState State = EVF_PhotoState::None;
 
@@ -66,12 +56,6 @@ protected:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "ViewFinder")
 	TObjectPtr<UVFViewFrustumComponent> ViewFrustumRecorder;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ViewFinder")
-	TObjectPtr<UTextureRenderTarget2D> RenderTarget = nullptr;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ViewFinder")
-	TObjectPtr<UMaterialInstanceDynamic> MaterialInstance = nullptr;
 
 	// UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ViewFinder")
 	// TEnumAsByte<ETextureRenderTargetFormat> Format;

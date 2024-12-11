@@ -1,6 +1,6 @@
 #include "VFPhotoContainer.h"
 
-#include "VFPhoto3D.h"
+#include "VFPhoto2D.h"
 
 
 AVFPhotoContainer::AVFPhotoContainer()
@@ -22,18 +22,18 @@ void AVFPhotoContainer::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void AVFPhotoContainer::AddAPhoto(AVFPhoto3D *Photo)
+void AVFPhotoContainer::AddAPhoto(AVFPhoto2D *Photo)
 {
-	Photos.EmplaceLast(Photo);
+	Photo2Ds.EmplaceLast(Photo);
 
-	if (!CurrentPhoto && !Photos.IsEmpty())
-		CurrentPhoto = Photos.Last();
+	if (!CurrentPhoto2D && !Photo2Ds.IsEmpty())
+		CurrentPhoto2D = Photo2Ds.Last();
 }
 
 void AVFPhotoContainer::CreateAPhoto(const FTransform &WorldTrans)
 {
 	// 需要缩放吗?
-	AVFPhoto3D *Photo = GetWorld()->SpawnActor<AVFPhoto3D>(
+	AVFPhoto2D *Photo = GetWorld()->SpawnActor<AVFPhoto2D>(
 		WorldTrans.GetLocation(),
 		WorldTrans.Rotator());
 	AddAPhoto(Photo);
@@ -41,7 +41,7 @@ void AVFPhotoContainer::CreateAPhoto(const FTransform &WorldTrans)
 
 void AVFPhotoContainer::PrepareCurrentPhoto(float Time)
 {
-	if (!CurrentPhoto)
+	if (!CurrentPhoto2D)
 		return;
 
 	Time = Time >= 0.f ? Time : TimeOfSelect;
@@ -49,7 +49,7 @@ void AVFPhotoContainer::PrepareCurrentPhoto(float Time)
 		PrepareTimeHandle, [this]()
 		{
             bFocusOn = true;
-            CurrentPhoto->SetViewFrustumVisible(true); },
+            CurrentPhoto2D->Preview(true); },
 		Time,
 		false);
 }
@@ -58,36 +58,36 @@ void AVFPhotoContainer::GiveUpPrepare()
 {
     GetWorldTimerManager().ClearTimer(PrepareTimeHandle);
     bFocusOn = false;
-    CurrentPhoto->SetViewFrustumVisible(false);
+    CurrentPhoto2D->Preview(false);
 }
 
 void AVFPhotoContainer::PlaceCurrentPhoto()
 {
-	CurrentPhoto->PlaceDown();
+	CurrentPhoto2D->PlaceDown();
 	ChangeCurrentPhoto(false);
 }
 
 void AVFPhotoContainer::ChangeCurrentPhoto(const bool &Next)
 {
-	if (Photos.Num() <= 1)
+	if (Photo2Ds.Num() <= 1)
 		return;
 
 	if (Next)
 	{
-		auto Photo = Photos.First();
-		Photos.PopFirst();
-		Photos.EmplaceLast();
+		auto Photo = Photo2Ds.First();
+		Photo2Ds.PopFirst();
+		Photo2Ds.EmplaceLast();
 	}
 	else
 	{
-		auto Photo = Photos.Last();
-		Photos.PopLast();
-		Photos.EmplaceFirst();
+		auto Photo = Photo2Ds.Last();
+		Photo2Ds.PopLast();
+		Photo2Ds.EmplaceFirst();
 	}
 	UpdateCurrentPhoto();
 }
 
 void AVFPhotoContainer::UpdateCurrentPhoto()
 {
-	CurrentPhoto = Photos.IsEmpty() ? nullptr : Photos.Last();
+	CurrentPhoto2D = Photo2Ds.IsEmpty() ? nullptr : Photo2Ds.Last();
 }

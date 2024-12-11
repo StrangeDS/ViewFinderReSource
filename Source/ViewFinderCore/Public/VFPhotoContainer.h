@@ -5,7 +5,7 @@
 #include "Containers/Deque.h"
 #include "VFPhotoContainer.generated.h"
 
-class AVFPhoto3D;
+class AVFPhoto2D;
 
 UCLASS(Blueprintable, ClassGroup = (ViewFinder))
 class VIEWFINDERCORE_API AVFPhotoContainer : public AActor
@@ -23,7 +23,7 @@ public:
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
-	void AddAPhoto(AVFPhoto3D *Photo);
+	void AddAPhoto(AVFPhoto2D *Photo);
 	
 	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
 	void CreateAPhoto(const FTransform &WorldTrans);
@@ -51,10 +51,10 @@ protected:
 	float TimeOfSelect = 0.5f;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "ViewFinder")
-	TObjectPtr<AVFPhoto3D> CurrentPhoto;
+	TObjectPtr<AVFPhoto2D> CurrentPhoto2D;
 
 	// UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "ViewFinder") // 不能修饰
-	TDeque<AVFPhoto3D *> Photos;
+	TDeque<AVFPhoto2D *> Photo2Ds;
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "ViewFinder")
 	FTimerHandle PrepareTimeHandle;

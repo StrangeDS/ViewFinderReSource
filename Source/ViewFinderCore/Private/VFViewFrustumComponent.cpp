@@ -5,6 +5,10 @@ UVFViewFrustumComponent::UVFViewFrustumComponent()
     SetComplexAsSimpleCollisionEnabled(false);
 	SetCollisionProfileName(TEXT("ViewFrustum"));
     SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+
+    // static ConstructorHelpers::FObjectFinder<UMaterialInstanceDynamic> MaterialSelector(TEXT("/Game/ViewFinder/Material/MI_ViewFrustum.MI_ViewFrustum"));
+    // Matirial = MaterialSelector.Object;
+    // SetMaterial(0, Matirial);
 }
 
 void UVFViewFrustumComponent::BeginPlay()

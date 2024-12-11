@@ -2,6 +2,9 @@
 
 #include "EnhancedInputSubsystems.h"
 #include "Camera/CameraComponent.h"
+#include "Kismet/GameplayStatics.h"
+
+#include "VFPhotoContainer.h"
 
 bool AVFPhotoCatcher_PickUp::Interact_Implementation(APlayerController *Controller)
 {
@@ -11,16 +14,37 @@ bool AVFPhotoCatcher_PickUp::Interact_Implementation(APlayerController *Controll
     Pawn = PlayerController->GetPawn();
     // 需要根据角色重写
     if (auto ToAttach = Pawn->GetComponentByClass<UCameraComponent>())
+    {
         PickUp(ToAttach);
-    return true;
+        // ToDo: 查找角色身上的Container.
+        TArray<AActor*> AttahcedActors;
+        Pawn->GetAttachedActors(AttahcedActors);
+        for (const auto &Actor : AttahcedActors)
+        {
+            if (Actor->GetClass()->IsChildOf(AVFPhotoContainer::StaticClass()))
+            {
+                Container = Cast<AVFPhotoContainer>(Actor);
+                return true;
+            }
+        }
+    }
+
+    UE_LOG(LogTemp, Warning, TEXT("AVFPhotoCatcher_PickUp::Interact_Implementation() has something wrong."));
+    return false;
 }
 
-void AVFPhotoCatcher_PickUp::TakeAPhoto_Implementation()
+AVFPhoto2D *AVFPhotoCatcher_PickUp::TakeAPhoto_Implementation()
 {
     if (!bReady)
-        return;
+        return nullptr;
 
-    Super::TakeAPhoto_Implementation();
+    if (ensure(Container))
+    {
+        auto Photo2D = Super::TakeAPhoto_Implementation();
+        Container->AddAPhoto(Photo2D);
+    }
+
+    return nullptr;
 }
 
 void AVFPhotoCatcher_PickUp::CloseToPreview_Implementation()

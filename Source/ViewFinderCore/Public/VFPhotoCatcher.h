@@ -32,8 +32,8 @@ public:
 
 public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ViewFinder")
-	void TakeAPhoto();
-	virtual void TakeAPhoto_Implementation();
+	AVFPhoto2D *TakeAPhoto();
+	virtual AVFPhoto2D *TakeAPhoto_Implementation();
 
 	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
 	void SetViewFrustumVisible(const bool &Visibility);

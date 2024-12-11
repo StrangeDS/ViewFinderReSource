@@ -1,7 +1,5 @@
 #include "VFPhoto3D.h"
 
-#include "Engine/TextureRenderTarget2D.h"
-#include "Components/SceneCaptureComponent2D.h"
 #include "Components/StaticMeshComponent.h"
 
 #include "VFDynamicMeshComponent.h"
@@ -26,15 +24,6 @@ AVFPhoto3D::AVFPhoto3D()
 void AVFPhoto3D::BeginPlay()
 {
 	Super::BeginPlay();
-
-	RenderTarget = NewObject<UTextureRenderTarget2D>(this);
-	RenderTarget->ResizeTarget(PixelNum, PixelNum);
-	RenderTarget->RenderTargetFormat = ETextureRenderTargetFormat::RTF_RGBA8;
-
-	// RenderTarget->RenderTargetFormat = Format;
-	// Target2D->ConstructTexture2D(this, TextureName.ToString(), EObjectFlags::RF_NoFlags); // necessary?
-	MaterialInstance = StaticMesh->CreateAndSetMaterialInstanceDynamic(0);
-	// MaterialInstance->SetTextureParameterValue(TextureName, RenderTarget);
 }
 
 void AVFPhoto3D::Tick(float DeltaTime)
@@ -138,16 +127,6 @@ void AVFPhoto3D::SetViewFrustumVisible(const bool &Visiblity)
 // 	ViewFrustumRecorder->CopyViewFrustum(ViewFrustum);
 // }
 
-void AVFPhoto3D::GetCaptured(USceneCaptureComponent2D *Capturer)
-{
-	if (!Capturer)
-		return;
-
-	UTextureRenderTarget2D *Original = Capturer->TextureTarget;
-	Capturer->TextureTarget = RenderTarget;
-	Capturer->CaptureScene();
-	Capturer->TextureTarget = Original;
-}
 
 void AVFPhoto3D::RecordProperty(
 	UVFViewFrustumComponent *ViewFrustum,

@@ -4,6 +4,9 @@
 #include "VFPhotoCatcher_Interact.h"
 #include "VFPhotoCatcher_PickUp.generated.h"
 
+// class UInputMappingContext;
+// class AVFPhotoContainer;
+
 UCLASS(Blueprintable, ClassGroup = (ViewFinder))
 class VIEWFINDERDEMO_API AVFPhotoCatcher_PickUp : public AVFPhotoCatcher_Interact
 {
@@ -12,7 +15,7 @@ class VIEWFINDERDEMO_API AVFPhotoCatcher_PickUp : public AVFPhotoCatcher_Interac
 public:
 	virtual bool Interact_Implementation(APlayerController* Controller) override;
 
-	virtual void TakeAPhoto_Implementation() override;
+	virtual AVFPhoto2D *TakeAPhoto_Implementation() override;
 	
 	virtual void CloseToPreview_Implementation() override;
 	
@@ -29,13 +32,16 @@ public:
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ViewFinder")
-	class UInputMappingContext *HoldingMappingContext;
+	TObjectPtr<class UInputMappingContext> HoldingMappingContext;
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "ViewFinder")
 	bool bPickedUp = false;
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "ViewFinder")
 	bool bReady = false;
+
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "ViewFinder")
+	TObjectPtr<class AVFPhotoContainer> Container;
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "ViewFinder")
 	FTimerHandle PreviewTimeHandle;

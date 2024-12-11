@@ -1,13 +1,13 @@
 #include "VFPhotoCatcher.h"
 
 #include "Components/StaticMeshComponent.h"
-
-#include "VFPhotoCaptureComponent.h"
 #include "VFDynamicMeshComponent.h"
-#include "VFPhoto3D.h"
-
-#include "VFFunctions.h"
 #include "Kismet/KismetSystemLibrary.h"
+
+#include "VFPhoto2D.h"
+#include "VFPhoto3D.h"
+#include "VFPhotoCaptureComponent.h"
+#include "VFFunctions.h"
 
 AVFPhotoCatcher::AVFPhotoCatcher()
 {
@@ -59,7 +59,7 @@ void AVFPhotoCatcher::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void AVFPhotoCatcher::TakeAPhoto_Implementation()
+AVFPhoto2D *AVFPhotoCatcher::TakeAPhoto_Implementation()
 {
 	TRACE_CPUPROFILER_EVENT_SCOPE(TEXT("AVFPhotoCatcher::TakeAPhoto_Implementation()"));
 	TArray<UPrimitiveComponent *> OverlapComps;
@@ -85,11 +85,12 @@ void AVFPhotoCatcher::TakeAPhoto_Implementation()
 	}
 	UE_LOG(LogTemp, Warning, TEXT("TakeAPhoto_Implementation overlaps %i"), OverlapComps.Num());
 
-	AVFPhoto3D *Photo = GetWorld()->SpawnActor<AVFPhoto3D>(
+	TArray<UVFDynamicMeshComponent *> CopiedComps;
+
+	AVFPhoto3D *Photo3D = GetWorld()->SpawnActor<AVFPhoto3D>(
 		ViewFrustum->GetComponentLocation(),
 		ViewFrustum->GetComponentRotation());
-	TArray<UVFDynamicMeshComponent *> CopiedComps;
-	auto ActorsCopied = UVFFunctions::CopyActorFromVFDMComps(Photo, VFDMComps, CopiedComps);
+	auto ActorsCopied = UVFFunctions::CopyActorFromVFDMComps(Photo3D, VFDMComps, CopiedComps);
 
 	if (bCuttingSource)
 	{
@@ -103,9 +104,15 @@ void AVFPhotoCatcher::TakeAPhoto_Implementation()
 	{
 		UVFFunctions::IntersectWithFrustum(Comp, ViewFrustum);
 	}
-	Photo->FoldUp();
-	Photo->RecordProperty(ViewFrustum, bOnlyOverlapWithHelps, ObjectTypesToOverlap);
-	// Photo->PlaceDown();
+
+	AVFPhoto2D *Photo2D = GetWorld()->SpawnActor<AVFPhoto2D>(
+		ViewFrustum->GetComponentLocation(),
+		ViewFrustum->GetComponentRotation());
+	Photo2D->SetPhoto3D(Photo3D);
+	Photo3D->RecordProperty(ViewFrustum, bOnlyOverlapWithHelps, ObjectTypesToOverlap);
+	Photo2D->FoldUp();
+	
+	return Photo2D;
 }
 
 void AVFPhotoCatcher::SetViewFrustumVisible(const bool &Visibility)
