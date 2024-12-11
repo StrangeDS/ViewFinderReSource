@@ -25,9 +25,10 @@ void AVFPhotoContainer::Tick(float DeltaTime)
 void AVFPhotoContainer::AddAPhoto(AVFPhoto2D *Photo)
 {
 	Photo2Ds.EmplaceLast(Photo);
+	Photo->AttachToComponent(Container, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 
-	if (!CurrentPhoto2D && !Photo2Ds.IsEmpty())
-		CurrentPhoto2D = Photo2Ds.Last();
+	// if (bFocusOn)
+		UpdateCurrentPhoto();
 }
 
 void AVFPhotoContainer::CreateAPhoto(const FTransform &WorldTrans)
@@ -54,7 +55,7 @@ void AVFPhotoContainer::PrepareCurrentPhoto(float Time)
 		false);
 }
 
-void AVFPhotoContainer::GiveUpPrepare()
+void AVFPhotoContainer::GiveUpPreparing()
 {
     GetWorldTimerManager().ClearTimer(PrepareTimeHandle);
     bFocusOn = false;
@@ -70,6 +71,9 @@ void AVFPhotoContainer::PlaceCurrentPhoto()
 void AVFPhotoContainer::ChangeCurrentPhoto(const bool &Next)
 {
 	if (Photo2Ds.Num() <= 1)
+		return;
+	
+	if (bFocusOn)
 		return;
 
 	if (Next)
@@ -89,5 +93,9 @@ void AVFPhotoContainer::ChangeCurrentPhoto(const bool &Next)
 
 void AVFPhotoContainer::UpdateCurrentPhoto()
 {
+	if (CurrentPhoto2D)
+		CurrentPhoto2D->SetActorHiddenInGame(true);
+
 	CurrentPhoto2D = Photo2Ds.IsEmpty() ? nullptr : Photo2Ds.Last();
+	CurrentPhoto2D->SetActorHiddenInGame(false);
 }

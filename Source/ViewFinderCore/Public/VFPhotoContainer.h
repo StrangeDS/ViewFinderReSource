@@ -32,7 +32,7 @@ public:
 	void PrepareCurrentPhoto(float Time = -1.0f);
 
 	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
-	void GiveUpPrepare();
+	void GiveUpPreparing();
 
 	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
 	void PlaceCurrentPhoto();

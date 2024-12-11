@@ -13,6 +13,15 @@ AVFPhoto2D::AVFPhoto2D()
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
 	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
 	StaticMesh->SetupAttachment(RootComponent);
+	// StaticMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	SetActorEnableCollision(false);
+
+    static ConstructorHelpers::FObjectFinder<UStaticMesh> MeshSelector(
+		TEXT("/Game/ViewFinder/StaticMesh/Plane.Plane")
+		);
+	StaticMeshObject = MeshSelector.Object;
+	StaticMesh->SetStaticMesh(StaticMeshObject);
+	StaticMesh->SetRelativeRotation(FRotator(0.f, 90.0f, 0.f));
 }
 
 void AVFPhoto2D::BeginPlay()
@@ -22,11 +31,6 @@ void AVFPhoto2D::BeginPlay()
 	RenderTarget = NewObject<UTextureRenderTarget2D>(this);
 	RenderTarget->ResizeTarget(PixelNum, PixelNum);
 	RenderTarget->RenderTargetFormat = ETextureRenderTargetFormat::RTF_RGBA8;
-
-	// RenderTarget->RenderTargetFormat = Format;
-	// Target2D->ConstructTexture2D(this, TextureName.ToString(), EObjectFlags::RF_NoFlags); // necessary?
-	MaterialInstance = StaticMesh->CreateAndSetMaterialInstanceDynamic(0);
-	// MaterialInstance->SetTextureParameterValue(TextureName, RenderTarget);
 }
 
 void AVFPhoto2D::Tick(float DeltaTime)
@@ -49,6 +53,12 @@ void AVFPhoto2D::SetPhoto(USceneCaptureComponent2D *Capturer)
 {
 	if (!Capturer)
 		return;
+
+	if (!MaterialInstance)
+	{
+		MaterialInstance = StaticMesh->CreateAndSetMaterialInstanceDynamic(0);
+		MaterialInstance->SetTextureParameterValue(TextureName, RenderTarget);
+	}
 
 	UTextureRenderTarget2D *Original = Capturer->TextureTarget;
 	Capturer->TextureTarget = RenderTarget;

@@ -17,11 +17,14 @@ class VIEWFINDERCORE_API UVFPhotoCaptureComponent : public USceneCaptureComponen
 public:
 	virtual void BeginPlay() override;
 
-	void Init(UStaticMeshComponent *Mesh, int Index, FName Name);
+	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
+	void Init(class UStaticMeshComponent* Mesh, int Index = 0, FName Name = TEXT("Texture"));
 
-	virtual void DrawImage();
+	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
+	void StartDraw();
 
-	virtual void ResetImage();
+	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
+	void EndDraw();
 
 protected:
 	UPROPERTY(EditAnywhere, Category = "ViewFinder")
@@ -30,17 +33,15 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "ViewFinder")
 	int Height = 1024;
 
-	UPROPERTY(EditAnywhere, Category = "ViewFinder")
-	FName TextureName = TEXT("Temp");
+	UPROPERTY(VisibleAnywhere, Category = "ViewFinder")
+	FName TextureName;
 
-	UPROPERTY()
-	TObjectPtr<UTextureRenderTarget2D> Target2D;
+	UPROPERTY(VisibleAnywhere, Category = "ViewFinder")
+	TObjectPtr<UTextureRenderTarget2D> RenderTarget;
 	
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, Category = "ViewFinder")
 	TObjectPtr<UMaterialInstanceDynamic> MaterialInstance;
 	
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, Category = "ViewFinder")
 	TObjectPtr<UTexture> OriginalTexture;
-
-	bool bUsingInstance = false;
 };

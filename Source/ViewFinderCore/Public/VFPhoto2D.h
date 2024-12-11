@@ -44,7 +44,11 @@ public:
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ViewFinder")
 	TObjectPtr<class UStaticMeshComponent> StaticMesh;
+	
+	UPROPERTY()
+	TObjectPtr<class UStaticMesh> StaticMeshObject;
 
+protected: // 材质相关
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ViewFinder")
 	int PixelNum = 1024;
 
@@ -52,10 +56,10 @@ protected:
 	FName TextureName = TEXT("Texture");
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ViewFinder")
-	TObjectPtr<UTextureRenderTarget2D> RenderTarget = nullptr;
+	TObjectPtr<UTextureRenderTarget2D> RenderTarget;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ViewFinder")
-	TObjectPtr<UMaterialInstanceDynamic> MaterialInstance = nullptr;
+	TObjectPtr<UMaterialInstanceDynamic> MaterialInstance;
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ViewFinder")

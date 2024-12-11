@@ -5,6 +5,7 @@
 #include "Kismet/GameplayStatics.h"
 
 #include "VFPhotoContainer.h"
+#include "VFPhotoCaptureComponent.h"
 
 bool AVFPhotoCatcher_PickUp::Interact_Implementation(APlayerController *Controller)
 {
@@ -56,6 +57,7 @@ void AVFPhotoCatcher_PickUp::CloseToPreview_Implementation()
         {
             bReady = true;
             SetViewFrustumVisible(true);
+            PhotoCapture->StartDraw();
         },
         TimeOfClose,
         false);
@@ -67,6 +69,7 @@ void AVFPhotoCatcher_PickUp::LeaveFromPreview_Implementation()
 
     GetWorldTimerManager().ClearTimer(PreviewTimeHandle);
     bReady = false;
+    PhotoCapture->EndDraw();
     SetViewFrustumVisible(false);
 }
 
