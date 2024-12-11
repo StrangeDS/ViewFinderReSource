@@ -38,14 +38,35 @@ public:
 	void PlaceCurrentPhoto();
 
 	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
-	void ChangeCurrentPhoto(const bool &Next);
+	void ChangeCurrentPhoto(const bool Next);
 
 	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
 	void UpdateCurrentPhoto();
+	
+	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
+	void SetEnabled(const bool &Enabled);
+	
+	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
+	FORCEINLINE void SetPlayerController(APlayerController *Controller) { PlayerController = Controller; };
+
+	UFUNCTION(BlueprintPure, Category = "ViewFinder")
+	FORCEINLINE int Num() { return Photo2Ds.Num(); };
+	
+	UFUNCTION(BlueprintPure, Category = "ViewFinder")
+	FORCEINLINE bool IsEnabled() { return bEnabled; };
 
 protected:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ViewFinder")
+	TObjectPtr<class UInputMappingContext> MappingContext;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ViewFinder")
+	TObjectPtr<APlayerController> PlayerController;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "ViewFinder")
 	bool bFocusOn = false;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "ViewFinder")
+	bool bEnabled = false;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "ViewFinder")
 	float TimeOfSelect = 0.5f;

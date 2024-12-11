@@ -12,6 +12,7 @@ public class ViewFinderCore : ModuleRules
 			new string[]
 			{
 				"Core",
+				"EnhancedInput",
 				"PhysicsCore",
 				"GeometryCore",
 				"GeometryFramework",
