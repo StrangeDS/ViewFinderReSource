@@ -45,7 +45,7 @@ void UVFDynamicMeshComponent::CopyMeshFromComponent(UPrimitiveComponent *Source)
         Source,
         MeshObject,
         FVF_GeometryScriptCopyMeshFromComponentOptions(),
-        true);
+        false);
 
     // 复制物理
     bool bUseComplex = SourceComponent->BodyInstance.bSimulatePhysics;

@@ -68,6 +68,8 @@ AActor *UVFFunctions::CloneActorRuntime(AActor *Original)
 		Actor->GetRootComponent()->SetMobility(EComponentMobility::Movable);
 	};
 	AActor *Copy = World->SpawnActor<AActor>(Original->GetClass(), Parameters);
+	// 手动设置transform是必要的, 否则会将Original相对于其父Actor(Photo3D)的相对Transform视为绝对Transform.
+	Copy->SetActorTransform(Original->GetActorTransform());
 	return Copy;
 }
 
@@ -81,7 +83,7 @@ UVFDynamicMeshComponent *UVFFunctions::CreateVFDMComponent(AActor *Actor, UPrimi
 
 	UVFDynamicMeshComponent *VFDMComp = NewObject<UVFDynamicMeshComponent>(Actor);
 	VFDMComp->RegisterComponent();
-	VFDMComp->AttachToComponent(Parent, FAttachmentTransformRules::KeepWorldTransform);
+	VFDMComp->AttachToComponent(Parent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 	Actor->AddInstanceComponent(VFDMComp);
 	VFDMComp->CopyMeshFromComponent(Parent);
 
@@ -125,9 +127,9 @@ TArray<UVFDynamicMeshComponent *> UVFFunctions::CheckVFDMComps(const TArray<UPri
 
 					UVFDynamicMeshComponent *VFDMComp = NewObject<UVFDynamicMeshComponent>(Actor);
 					VFDMComp->RegisterComponent();
-					VFDMComp->AttachToComponent(PrimComp, FAttachmentTransformRules::KeepWorldTransform);
+					VFDMComp->AttachToComponent(PrimComp, FAttachmentTransformRules::SnapToTargetIncludingScale);
 					Actor->AddInstanceComponent(VFDMComp);
-					VFDMComp->CopyMeshFromComponent(PrimComp);
+					VFDMComp->CopyMeshFromComponent(PrimComp, false);
 
 					Result.Add(VFDMComp);
 				}
@@ -174,7 +176,6 @@ TArray<AActor *> UVFFunctions::CopyActorFromVFDMComps(AVFPhoto3D *Photo, const T
 		{
 			AActor *Copy = CloneActorRuntime(Source);
 			Copy->AttachToActor(Photo, FAttachmentTransformRules::KeepWorldTransform);
-
 			ActorsMap.Add(Source, Copy);
 		}
 		AActor *Copied = ActorsMap[Source];
@@ -183,7 +184,7 @@ TArray<AActor *> UVFFunctions::CopyActorFromVFDMComps(AVFPhoto3D *Photo, const T
 	for (UVFDynamicMeshComponent *Component : Components)
 	{
 		auto CopiedComp = GetCloneVFDMComp(Component, ActorsMap[Component->GetOwner()]);
-		CopiedComp->CopyMeshFromComponent(Component);
+		CopiedComp->CopyMeshFromComponent(Component, false);
 		CopiedComps.Emplace(CopiedComp);
 	}
 
