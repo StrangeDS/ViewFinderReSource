@@ -45,26 +45,16 @@ public:
 		UPARAM(ref) const TArray<UVFDynamicMeshComponent *> &Components,
 		UPARAM(ref) TArray<UVFDynamicMeshComponent *> &CopiedComps);
 
-	// UFUNCTION(BlueprintCallable, Category = "ViewFinder")
-	// static void FilterPrimCompsWithHelper(
-	// 	TArray<UPrimitiveComponent *> &Components,
-	// 	TMap<UVFDynamicMeshComponent *, UVFHelperComponent *> &Map);
-
+	template <typename T>
 	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
 	static void GetCompsToHelpersMapping(
-		UPARAM(ref) TArray<UVFDynamicMeshComponent *> &Components,
-		UPARAM(ref) TMap<UVFDynamicMeshComponent *, UVFHelperComponent *> &Map);
+		UPARAM(ref) TArray<T *> &Components,
+		UPARAM(ref) TMap<UPrimitiveComponent *, UVFHelperComponent *> &Map);
 
 	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
 	static AVFPhoto3D *TakeAPhoto(
 		UVFViewFrustumComponent *ViewFrustum,
 		UPARAM(ref) const TArray<UPrimitiveComponent *> &Components);
-
-	// UFUNCTION(BlueprintCallable, Category = "ViewFinder")
-	// static void PlaceAPhoto(AVFPhoto3D *Photo, FTransform WorldTrans);.
-
-	// UFUNCTION(BlueprintCallable, Category = "ViewFinder")
-	// static AVFPhotoContainer *CreateAPhoto(UWorld *World, FTransform WorldTrans);
 
 public: // 网格布尔操作
 	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
@@ -79,3 +69,15 @@ public: // 网格布尔操作
 	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
 	static void SubtractWithFrustum(UVFDynamicMeshComponent *Target, UVFViewFrustumComponent *ViewFrustum);
 };
+
+template <typename T>
+inline void UVFFunctions::GetCompsToHelpersMapping(UPARAM(ref) TArray<T *> &Components, UPARAM(ref) TMap<UPrimitiveComponent *, UVFHelperComponent *> &Map)
+{
+	check(T::StaticClass()->IsChildOf(UPrimitiveComponent::StaticClass()));
+	for (auto It = Components.CreateIterator(); It; It++)
+	{
+		auto Helper = (*It)->GetOwner()->GetComponentByClass<UVFHelperComponent>();
+		if (Helper)
+			Map.Add(Cast<UPrimitiveComponent>(*It), Helper);
+	}
+}

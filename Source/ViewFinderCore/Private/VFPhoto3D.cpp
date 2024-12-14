@@ -31,33 +31,13 @@ void AVFPhoto3D::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-// void AVFPhoto3D::FoldUp(const bool &NeedHide)
-// {
-// 	if (State == EVF_PhotoState::Folded)
-// 		return;
-// 	State = EVF_PhotoState::Folded;
-
-// 	if (!NeedHide)
-// 	{
-// 		static FVector Distance(30000.0f, 0.f, 0.f);
-// 		SetActorLocation(Distance);
-// 	}
-
-// 	TArray<AActor *> Actors;
-// 	GetAttachedActors(Actors, true, true);
-// 	for (const auto &Actor : Actors)
-// 	{
-// 		Actor->SetActorEnableCollision(false);
-// 		if (NeedHide)
-// 			Actor->SetActorHiddenInGame(true);
-// 	}
-// }
 void AVFPhoto3D::FoldUp()
 {
 	if (State == EVF_PhotoState::Folded)
 		return;
 	State = EVF_PhotoState::Folded;
 
+	SetVFDMCompsEnabled(false);
 	TArray<AActor *> Actors;
 	GetAttachedActors(Actors, true, true);
 	for (const auto &Actor : Actors)
@@ -82,25 +62,35 @@ void AVFPhoto3D::PlaceDown()
 		{},
 		OverlapComps);
 
-	auto VFDMComps = UVFFunctions::CheckVFDMComps(OverlapComps);
+	TMap<UPrimitiveComponent *, UVFHelperComponent *> HelperMap;
+	UVFFunctions::GetCompsToHelpersMapping(OverlapComps, HelperMap);
 
-	TMap<UVFDynamicMeshComponent *, UVFHelperComponent *> HelperMap;
-	UVFFunctions::GetCompsToHelpersMapping(VFDMComps, HelperMap);
-
-	for (auto It = VFDMComps.CreateIterator(); It; It++)
+	for (auto It = OverlapComps.CreateIterator(); It; It++)
 	{
 		auto Comp = *It;
-		auto Helper = HelperMap[Comp];
+		auto Helper = HelperMap.Find(Comp); // 可能为nullptr
 		if (bOnlyOverlapWithHelps && !Helper)
 			It.RemoveCurrent();
 		else if (Helper && !HelperMap[Comp]->bCanBePlacedByPhoto)
 			It.RemoveCurrent();
 	}
+
+	TSet<UVFHelperComponent *> HelpersRecorder;
+	for (auto &[Comp, Helper] : HelperMap)
+	{
+		HelpersRecorder.Add(Helper);
+	}
+
+	auto VFDMComps = UVFFunctions::CheckVFDMComps(OverlapComps);
 	UE_LOG(LogTemp, Warning, TEXT("PlaceDown overlaps %i"), VFDMComps.Num());
 
 	for (auto Comp : VFDMComps)
 	{
 		UVFFunctions::SubtractWithFrustum(Comp, ViewFrustumRecorder);
+	}
+	for (auto &Helper : HelpersRecorder)
+	{
+		Helper->NotifyDelegate(FVFHelperDelegateType::OriginalAfterCutByPhoto);
 	}
 
 	TArray<AActor *> Actors;
@@ -110,6 +100,15 @@ void AVFPhoto3D::PlaceDown()
 		Actor->SetActorEnableCollision(true);
 		Actor->SetActorHiddenInGame(false);
 	}
+	SetVFDMCompsEnabled(true);
+	
+	for (const auto Actor : Actors)
+	{
+		if (auto Helper = Actor->GetComponentByClass<UVFHelperComponent>())
+		{
+			Helper->NotifyDelegate(FVFHelperDelegateType::CopyAfterPlacedByPhoto);
+		}
+	}
 }
 
 void AVFPhoto3D::SetViewFrustumVisible(const bool &Visiblity)
@@ -117,15 +116,22 @@ void AVFPhoto3D::SetViewFrustumVisible(const bool &Visiblity)
 	ViewFrustumRecorder->SetHiddenInGame(!Visiblity);
 }
 
-// void AVFPhoto3D::GetVFDMComps(TArray<UVFDynamicMeshComponent *> &Comps)
-// {
-// 	GetComponents<UVFDynamicMeshComponent>(Comps);
-// }
-
-// void AVFPhoto3D::RecordProperty(UVFViewFrustumComponent *ViewFrustum)
-// {
-// 	ViewFrustumRecorder->CopyViewFrustum(ViewFrustum);
-// }
+void AVFPhoto3D::SetVFDMCompsEnabled(const bool &Enabled)
+{
+	int Count = 0;
+	TArray<AActor*> Actors;
+	GetAttachedActors(Actors, true, true);
+	for (const auto &Actor : Actors)
+	{
+		TArray<UVFDynamicMeshComponent*> VFDMComps;
+		Actor->GetComponents<UVFDynamicMeshComponent>(VFDMComps);
+		for (const auto &Comp : VFDMComps)
+		{
+			Comp->SetEnabled(Enabled);
+		}
+		Count = Count + VFDMComps.Num();
+	}
+}
 
 
 void AVFPhoto3D::RecordProperty(

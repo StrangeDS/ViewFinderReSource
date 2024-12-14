@@ -48,25 +48,29 @@ void UVFDynamicMeshComponent::CopyMeshFromComponent(UPrimitiveComponent *Source)
         false);
 
     // 复制物理
-    bool bUseComplex = SourceComponent->BodyInstance.bSimulatePhysics;
     // 复制碰撞预设, 类型等. 原静态网格体的简单碰撞可能与显示不一致, 自动生成的碰撞并不完美(以及不能智能地选择生成碰撞的设置).
     SetCollisionProfileName(SourceComponent->GetCollisionProfileName());
-    if (Source->BodyInstance.bSimulatePhysics)
+    if (SourceComponent->BodyInstance.bSimulatePhysics)
     {
         // 生成简单碰撞模拟物理, 面数该如何抉择?
         SetComplexAsSimpleCollisionEnabled(false, true);
         UpdateSimlpeCollision();
-        SetSimulatePhysics(Source->BodyInstance.bSimulatePhysics);
-        SetEnableGravity(Source->IsGravityEnabled());
+        // 从静态网格体上复制需要应用物理状态, 但从VFDMComp上复制不需要立即应用
+        bSimulatePhysicsRecorder = SourceComponent->BodyInstance.bSimulatePhysics;
+        bEnableGravityRecorder = SourceComponent->IsGravityEnabled();
+        SetSimulatePhysics(bSimulatePhysicsRecorder);
+        SetEnableGravity(bEnableGravityRecorder);
     }
     else
     {
         // 使用复杂碰撞
         SetComplexAsSimpleCollisionEnabled(true, true);
     }
-    SetCollisionEnabled(Source->GetCollisionEnabled());
+    SetCollisionEnabled(SourceComponent->GetCollisionEnabled());
 
-    SetMaterial(0, Source->GetMaterial(0));
+    // 复制材质
+    SetMaterial(0, SourceComponent->GetMaterial(0));
+    
     // TODO: 传递事件. 暂使用Actor接口
 }
 
@@ -98,6 +102,26 @@ void UVFDynamicMeshComponent::UpdateSimlpeCollision()
         MeshObject,
         this,
         Options);
+}
+
+void UVFDynamicMeshComponent::SetEnabled(bool Enabled)
+{
+    if (bEnabled == Enabled)
+        return;
+    bEnabled = Enabled;
+    
+    if (bEnabled)
+    {
+        SetSimulatePhysics(bSimulatePhysicsRecorder);
+        SetEnableGravity(bEnableGravityRecorder);
+    }
+    else
+    {
+        SetSimulatePhysics(false);
+        SetEnableGravity(false);
+        if (bSimulatePhysicsRecorder)
+            AttachToComponent(GetOwner()->GetRootComponent(), FAttachmentTransformRules::KeepWorldTransform);
+    }
 }
 
 UPrimitiveComponent *UVFDynamicMeshComponent::GetSourceComponent()

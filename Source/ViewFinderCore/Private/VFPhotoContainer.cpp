@@ -14,11 +14,10 @@ AVFPhotoContainer::AVFPhotoContainer()
 	Container = CreateDefaultSubobject<USceneComponent>(TEXT("Container"));
 	Container->SetupAttachment(RootComponent);
 
-    static ConstructorHelpers::FObjectFinder<UInputMappingContext> Selector(
-		TEXT("/Game/ViewFinder/Input/IMC_PhotoContainer.IMC_PhotoContainer")
-		);
+	static ConstructorHelpers::FObjectFinder<UInputMappingContext> Selector(
+		TEXT("/Game/ViewFinder/Input/IMC_PhotoContainer.IMC_PhotoContainer"));
 	UE_LOG(LogTemp, Warning, TEXT("Selector: %i"), Selector.Succeeded());
-    MappingContext = Selector.Object;
+	MappingContext = Selector.Object;
 }
 
 void AVFPhotoContainer::BeginPlay()
@@ -54,11 +53,12 @@ void AVFPhotoContainer::PrepareCurrentPhoto(float Time)
 		return;
 
 	Time = Time >= 0.f ? Time : TimeOfSelect;
+	PlayerController->GetPawn()->DisableInput(PlayerController);
 	GetWorldTimerManager().SetTimer(
 		PrepareTimeHandle, [this]()
 		{
             bFocusOn = true;
-            CurrentPhoto2D->Preview(true); },
+            CurrentPhoto2D->Preview(GetActorTransform(), true); },
 		Time,
 		false);
 }
@@ -67,13 +67,18 @@ void AVFPhotoContainer::GiveUpPreparing()
 {
 	GetWorldTimerManager().ClearTimer(PrepareTimeHandle);
 	bFocusOn = false;
-	CurrentPhoto2D->Preview(false);
+	CurrentPhoto2D->Preview(GetActorTransform(), false);
+	PlayerController->GetPawn()->EnableInput(PlayerController);
 }
 
 void AVFPhotoContainer::PlaceCurrentPhoto()
 {
+	CurrentPhoto2D->Preview(GetActorTransform(), false);
+	CurrentPhoto2D->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 	CurrentPhoto2D->PlaceDown();
-	ChangeCurrentPhoto(false);
+	Photo2Ds.PopLast();
+	GiveUpPreparing();
+	UpdateCurrentPhoto();
 }
 
 void AVFPhotoContainer::ChangeCurrentPhoto(const bool Next)
@@ -97,7 +102,6 @@ void AVFPhotoContainer::ChangeCurrentPhoto(const bool Next)
 		Photo2Ds.EmplaceFirst(Photo);
 	}
 	UpdateCurrentPhoto();
-	SetEnabled(true);
 }
 
 void AVFPhotoContainer::UpdateCurrentPhoto()
@@ -109,9 +113,11 @@ void AVFPhotoContainer::UpdateCurrentPhoto()
 
 	if (CurrentPhoto2D)
 	{
-		CurrentPhoto2D->SetActorHiddenInGame(false);
+		if (bEnabled)
+			CurrentPhoto2D->SetActorHiddenInGame(false);
 	}
-	else{
+	else
+	{
 		SetEnabled(false);
 	}
 }
@@ -132,15 +138,17 @@ void AVFPhotoContainer::SetEnabled(const bool &Enabled)
 		auto Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer());
 		if (Subsystem)
 			Subsystem->AddMappingContext(MappingContext, 2);
-        EnableInput(PlayerController);
+		EnableInput(PlayerController);
 		SetActorHiddenInGame(false);
+		UpdateCurrentPhoto();
 	}
 	else
 	{
-        DisableInput(PlayerController);
+		DisableInput(PlayerController);
 		auto Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer());
 		if (Subsystem)
 			Subsystem->RemoveMappingContext(MappingContext);
 		SetActorHiddenInGame(true);
+		UpdateCurrentPhoto();
 	}
 }

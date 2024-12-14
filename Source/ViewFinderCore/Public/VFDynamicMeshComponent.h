@@ -12,6 +12,7 @@ class VIEWFINDERCORE_API UVFDynamicMeshComponent : public UDynamicMeshComponent
 {
 	GENERATED_BODY()
 
+public:
 	UVFDynamicMeshComponent(const FObjectInitializer& ObjectInitializer);
 
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
@@ -23,7 +24,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
 	virtual void CopyMeshFromComponent(UPrimitiveComponent* Source);
 
+	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
 	void UpdateSimlpeCollision();
+
+	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
+	void SetEnabled(bool Enabled);
 
 public:	// SourceComponent
 	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
@@ -31,11 +36,21 @@ public:	// SourceComponent
 
 	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
 	bool IsSourceVFDMComp();
+	
+protected:	// Enabled
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "ViewFinder")
+	bool bEnabled = true;
+
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "ViewFinder")
+	bool bSimulatePhysicsRecorder = false;
+	
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "ViewFinder")
+	bool bEnableGravityRecorder = false;
 
 protected:
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "ViewFinder")
 	EVFMeshType MeshType = EVFMeshType::None;
 
-	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "ViewFinder")
+	UPROPERTY(BlueprintReadWrite, Category = "ViewFinder")
 	TObjectPtr<UPrimitiveComponent> SourceComponent;
 };

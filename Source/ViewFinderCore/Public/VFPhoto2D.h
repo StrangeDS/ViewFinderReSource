@@ -36,7 +36,7 @@ public:
 	void FoldUp();
 
 	UFUNCTION(BlueprintCallable, CallInEditor, Category = "ViewFinder")
-	void Preview(const bool &Enabled);
+	void Preview(const FTransform& WorldTrans, const bool &Enabled);
 
 	UFUNCTION(BlueprintCallable, CallInEditor, Category = "ViewFinder")
 	void PlaceDown();

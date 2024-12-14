@@ -6,9 +6,11 @@ UVFViewFrustumComponent::UVFViewFrustumComponent()
 	SetCollisionProfileName(TEXT("ViewFrustum"));
     SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 
-    // static ConstructorHelpers::FObjectFinder<UMaterialInstanceDynamic> MaterialSelector(TEXT("/Game/ViewFinder/Material/MI_ViewFrustum.MI_ViewFrustum"));
-    // Matirial = MaterialSelector.Object;
-    // SetMaterial(0, Matirial);
+    static ConstructorHelpers::FObjectFinder<UMaterialInterface> MaterialSelector(
+        TEXT("/Game/ViewFinder/Material/MI_ViewFrustum.MI_ViewFrustum")
+        );
+    Matirial = MaterialSelector.Object;
+    SetMaterial(0, Matirial);
 }
 
 void UVFViewFrustumComponent::BeginPlay()
@@ -48,5 +50,5 @@ void UVFViewFrustumComponent::RecordViewFrustum(UVFViewFrustumComponent *Other)
 	SetCollisionProfileName(TEXT("ViewFrustum"));
     UVFGeometryFunctions::SetDynamicMeshCollisionFromMesh(MeshObject, this, CollisionOptions);
     SetComplexAsSimpleCollisionEnabled(false);
-    SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 }

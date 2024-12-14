@@ -1,6 +1,6 @@
 #include "VFHelperComponent.h"
 
-UVFHelperComponent::UVFHelperComponent()
+UVFHelperComponent::UVFHelperComponent(const FObjectInitializer& ObjectInitializer)
 {
 	PrimaryComponentTick.bCanEverTick = false;
 }
@@ -17,22 +17,38 @@ void UVFHelperComponent::TickComponent(float DeltaTime, ELevelTick TickType, FAc
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
-void UVFHelperComponent::BeginActorTakenInPhoto()
+bool UVFHelperComponent::NotifyDelegate(const FVFHelperDelegateType &Type)
 {
-	ActorBeginTakenInPhoto.Broadcast();
-}
-
-void UVFHelperComponent::EndActorTakenInPhoto()
-{
-	EndTakenInPhotoSignature.Broadcast();
-}
-
-void UVFHelperComponent::BeginActorPlacedFromPhoto()
-{
-	BeginPlacedFromPhotoSignature.Broadcast();
-}
-
-void UVFHelperComponent::EndActorPlacedFromPhoto()
-{
-	EndPlacedFromPhotoSignature.Broadcast();
+	bool IsHandled = false;
+	switch (Type)
+	{
+	case FVFHelperDelegateType::OriginalBeforeTakenInPhoto:
+		OnOriginalBeforeTakenInPhoto.Broadcast();
+		IsHandled = true;
+		break;
+	case FVFHelperDelegateType::OriginalBeforeCopyingToPhoto:
+		OnOriginalBeforeCopyingToPhoto.Broadcast();
+		IsHandled = true;
+		break;
+	case FVFHelperDelegateType::OriginalAfterCutByPhoto:
+		OnOriginalAfterCutByPhoto.Broadcast();
+		IsHandled = true;
+		break;
+	case FVFHelperDelegateType::CopyAfterCopiedForPhoto:
+		OnCopyAfterCopiedForPhoto.Broadcast();
+		IsHandled = true;
+		break;
+	case FVFHelperDelegateType::CopyBeforeFoldedInPhoto:
+		OnCopyBeforeFoldedInPhoto.Broadcast();
+		IsHandled = true;
+		break;
+	case FVFHelperDelegateType::CopyAfterPlacedByPhoto:
+		OnCopyAfterPlacedByPhoto.Broadcast();
+		IsHandled = true;
+		break;
+	default:
+		UE_LOG(LogTemp, Warning, TEXT("UVFHelperComponent::NotifyDelegate() don't handle."));
+		break;
+	}
+	return IsHandled;
 }

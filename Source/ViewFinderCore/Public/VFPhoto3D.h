@@ -44,8 +44,8 @@ public:
 	UFUNCTION(BlueprintCallable, CallInEditor, Category = "ViewFinder")
 	void SetViewFrustumVisible(const bool &Visiblity);
 	
-	// UFUNCTION(BlueprintCallable, Category = "ViewFinder")
-	// void GetVFDMComps(TArray<UVFDynamicMeshComponent *> &Comps);
+	UFUNCTION(BlueprintCallable, CallInEditor, Category = "ViewFinder")
+	void SetVFDMCompsEnabled(const bool &Enabled);
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ViewFinder")

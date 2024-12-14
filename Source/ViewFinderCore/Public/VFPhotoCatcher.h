@@ -27,7 +27,7 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-public:	
+public:
 	virtual void Tick(float DeltaTime) override;
 
 public:
@@ -55,7 +55,7 @@ protected:
 	bool bOnlyOverlapWithHelps = false;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ViewFinder")
-	bool bCuttingSource = false;
+	bool bCuttingOrignal = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ViewFinder")
 	TArray<TObjectPtr<AActor>> ActorsToIgnore;

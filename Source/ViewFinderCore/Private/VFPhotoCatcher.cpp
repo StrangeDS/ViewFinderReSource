@@ -9,6 +9,17 @@
 #include "VFPhotoCaptureComponent.h"
 #include "VFFunctions.h"
 
+static void GetMapHelpers(
+	const TMap<UPrimitiveComponent *, UVFHelperComponent *> &Map,
+	TSet<UVFHelperComponent *> &Helpers)
+{
+	Helpers.Reset();
+	for (auto &[Comp, Helper] : Map)
+	{
+		Helpers.Add(Helper);
+	}
+}
+
 AVFPhotoCatcher::AVFPhotoCatcher()
 {
 	PrimaryActorTick.bCanEverTick = false;
@@ -63,6 +74,7 @@ void AVFPhotoCatcher::Tick(float DeltaTime)
 AVFPhoto2D *AVFPhotoCatcher::TakeAPhoto_Implementation()
 {
 	TRACE_CPUPROFILER_EVENT_SCOPE(TEXT("AVFPhotoCatcher::TakeAPhoto_Implementation()"));
+	// 重叠检测
 	TArray<UPrimitiveComponent *> OverlapComps;
 	UKismetSystemLibrary::ComponentOverlapComponents(
 		ViewFrustum,
@@ -71,41 +83,92 @@ AVFPhoto2D *AVFPhotoCatcher::TakeAPhoto_Implementation()
 		UPrimitiveComponent::StaticClass(),
 		ActorsToIgnore,
 		OverlapComps);
-	auto VFDMComps = UVFFunctions::CheckVFDMComps(OverlapComps);
 
-	TMap<UVFDynamicMeshComponent *, UVFHelperComponent *> HelperMap;
-	UVFFunctions::GetCompsToHelpersMapping(VFDMComps, HelperMap);
-	for (auto It = VFDMComps.CreateIterator(); It; It++)
+	// Helper筛选
+	TMap<UPrimitiveComponent *, UVFHelperComponent *> HelperMap;
+	UVFFunctions::GetCompsToHelpersMapping<UPrimitiveComponent>(OverlapComps, HelperMap);
+
+	PhotoCapture->HiddenComponents.Reset();
+	for (auto It = OverlapComps.CreateIterator(); It; It++)
 	{
 		auto Comp = *It;
-		auto Helper = HelperMap[Comp];
+		auto Helper = HelperMap.Find(Comp); // 可能为nullptr
 		if (bOnlyOverlapWithHelps && !Helper)
+		{
+			PhotoCapture->HiddenComponents.AddUnique(Comp);
 			It.RemoveCurrent();
-		else if (Helper && !HelperMap[Comp]->bCanBePlacedByPhoto)
+		}
+		else if (Helper && !HelperMap[Comp]->bCanBeTakenInPhoto)
+		{
+			PhotoCapture->HiddenComponents.AddUnique(Comp);
 			It.RemoveCurrent();
+		}
 	}
-	UE_LOG(LogTemp, Warning, TEXT("TakeAPhoto_Implementation overlaps %i"), OverlapComps.Num());
 
+	TSet<UVFHelperComponent *> HelpersRecorder;
+	GetMapHelpers(HelperMap, HelpersRecorder);
+
+	for (auto &Helper : HelpersRecorder)
+	{
+		Helper->NotifyDelegate(FVFHelperDelegateType::OriginalBeforeTakenInPhoto);
+	}
+
+	// 基元组件下创建对应VFDynamicMeshComponent
+	auto VFDMComps = UVFFunctions::CheckVFDMComps(OverlapComps);
+	// 需要排序吗?
+	// Algo::Sort(VFDMComps, [](UVFDynamicMeshComponent *A, UVFDynamicMeshComponent *B)
+	// 			{ return A->GetOwner()->GetName() < B->GetOwner()->GetName(); });
+	// for (auto Comp: VFDMComps)
+	// {
+	// 	UE_LOG(LogTemp, Warning, TEXT("%s"), *Comp->GetOwner()->GetName());
+	// }
+	UE_LOG(LogTemp, Warning, TEXT("TakeAPhoto_Implementation overlaps %i"), VFDMComps.Num());
+	
+	for (auto &Helper : HelpersRecorder)
+	{
+		Helper->NotifyDelegate(FVFHelperDelegateType::OriginalBeforeCopyingToPhoto);
+	}
+	// 复制对应Actor
 	TArray<UVFDynamicMeshComponent *> CopiedComps;
-
 	AVFPhoto3D *Photo3D = GetWorld()->SpawnActor<AVFPhoto3D>(
 		ViewFrustum->GetComponentLocation(),
 		ViewFrustum->GetComponentRotation());
 	auto ActorsCopied = UVFFunctions::CopyActorFromVFDMComps(Photo3D, VFDMComps, CopiedComps);
 
-	if (bCuttingSource)
+	TMap<UPrimitiveComponent *, UVFHelperComponent *> CopiedHelperMap;
+	UVFFunctions::GetCompsToHelpersMapping<UVFDynamicMeshComponent>(CopiedComps, CopiedHelperMap);
+	TSet<UVFHelperComponent *> CopiedHelpersRecorder;
+	GetMapHelpers(CopiedHelperMap, CopiedHelpersRecorder);
+
+	for (auto &Helper : CopiedHelpersRecorder)
+	{
+		Helper->NotifyDelegate(FVFHelperDelegateType::CopyAfterCopiedForPhoto);
+	}
+
+	// 原VFDynamicMeshComponent做切割
+	if (bCuttingOrignal)
 	{
 		for (auto &Comp : VFDMComps)
 		{
 			UVFFunctions::SubtractWithFrustum(Comp, ViewFrustum);
 		}
+		for (auto &Helper : HelpersRecorder)
+		{
+			Helper->NotifyDelegate(FVFHelperDelegateType::OriginalAfterCutByPhoto);
+		}
 	}
 
+	// 新VFDynamicMeshComponent做交集
 	for (auto &Comp : CopiedComps)
 	{
 		UVFFunctions::IntersectWithFrustum(Comp, ViewFrustum);
 	}
+	for (auto &Helper : CopiedHelpersRecorder)
+	{
+		Helper->NotifyDelegate(FVFHelperDelegateType::CopyBeforeFoldedInPhoto);
+	}
 
+	// 创建照片, 后续处理
 	AVFPhoto2D *Photo2D = GetWorld()->SpawnActor<AVFPhoto2D>(
 		ViewFrustum->GetComponentLocation(),
 		ViewFrustum->GetComponentRotation());
@@ -113,7 +176,7 @@ AVFPhoto2D *AVFPhotoCatcher::TakeAPhoto_Implementation()
 	Photo2D->SetPhoto(PhotoCapture);
 	Photo3D->RecordProperty(ViewFrustum, bOnlyOverlapWithHelps, ObjectTypesToOverlap);
 	Photo2D->FoldUp();
-	
+
 	return Photo2D;
 }
 

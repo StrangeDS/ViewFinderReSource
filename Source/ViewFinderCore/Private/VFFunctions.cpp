@@ -129,7 +129,7 @@ TArray<UVFDynamicMeshComponent *> UVFFunctions::CheckVFDMComps(const TArray<UPri
 					VFDMComp->RegisterComponent();
 					VFDMComp->AttachToComponent(PrimComp, FAttachmentTransformRules::SnapToTargetIncludingScale);
 					Actor->AddInstanceComponent(VFDMComp);
-					VFDMComp->CopyMeshFromComponent(PrimComp, false);
+					VFDMComp->CopyMeshFromComponent(PrimComp);
 
 					Result.Add(VFDMComp);
 				}
@@ -184,7 +184,7 @@ TArray<AActor *> UVFFunctions::CopyActorFromVFDMComps(AVFPhoto3D *Photo, const T
 	for (UVFDynamicMeshComponent *Component : Components)
 	{
 		auto CopiedComp = GetCloneVFDMComp(Component, ActorsMap[Component->GetOwner()]);
-		CopiedComp->CopyMeshFromComponent(Component, false);
+		CopiedComp->CopyMeshFromComponent(Component);
 		CopiedComps.Emplace(CopiedComp);
 	}
 
@@ -195,31 +195,6 @@ TArray<AActor *> UVFFunctions::CopyActorFromVFDMComps(AVFPhoto3D *Photo, const T
 	}
 
 	return Result;
-}
-
-// void UVFFunctions::FilterPrimCompsWithHelper(
-// 	TArray<UPrimitiveComponent *> &Components,
-// 	TMap<UVFDynamicMeshComponent *, UVFHelperComponent *> &Map)
-// {
-// 	for (auto It = Components.CreateIterator(); It; It++)
-// 	{
-// 		auto Helper = (*It)->GetOwner()->GetComponentByClass<UVFHelperComponent>();
-// 		if (Helper && Helper->bCanBeTakenInPhoto)
-// 			Map.Add(*It, Helper);
-// 		else
-// 			It.RemoveCurrent();
-// 	}
-// }
-
-void UVFFunctions::GetCompsToHelpersMapping(
-	TArray<UVFDynamicMeshComponent *> &Components,
-	TMap<UVFDynamicMeshComponent *, UVFHelperComponent *> &Map)
-{
-	for (auto It = Components.CreateIterator(); It; It++)
-	{
-		auto Helper = (*It)->GetOwner()->GetComponentByClass<UVFHelperComponent>();
-		Map.Add(*It, Helper);
-	}
 }
 
 AVFPhoto3D *UVFFunctions::TakeAPhoto(UVFViewFrustumComponent *ViewFrustum, const TArray<UPrimitiveComponent *> &Components)

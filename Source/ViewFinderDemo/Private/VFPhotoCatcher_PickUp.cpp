@@ -43,6 +43,8 @@ AVFPhoto2D *AVFPhotoCatcher_PickUp::TakeAPhoto_Implementation()
     {
         auto Photo2D = Super::TakeAPhoto_Implementation();
         Container->AddAPhoto(Photo2D);
+        Container->SetEnabled(true);
+        LeaveFromPreview();
     }
 
     return nullptr;

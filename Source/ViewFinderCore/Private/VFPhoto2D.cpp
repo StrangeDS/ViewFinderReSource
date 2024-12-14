@@ -74,12 +74,13 @@ void AVFPhoto2D::FoldUp()
 	Photo3D->FoldUp();
 }
 
-void AVFPhoto2D::Preview(const bool &Enabled)
+void AVFPhoto2D::Preview(const FTransform& WorldTrans, const bool &Enabled)
 {
 	if (!Photo3D)
 		return;
 	
-	Photo3D->SetViewFrustumVisible(true);
+	Photo3D->SetActorTransform(WorldTrans);
+	Photo3D->SetViewFrustumVisible(Enabled);
 }
 
 void AVFPhoto2D::PlaceDown()
@@ -87,7 +88,6 @@ void AVFPhoto2D::PlaceDown()
 	if (!Photo3D)
 		return;
 
-	Photo3D->SetActorTransform(GetActorTransform());
 	Photo3D->PlaceDown();
 	SetActorHiddenInGame(true);
 	SetActorEnableCollision(false);
