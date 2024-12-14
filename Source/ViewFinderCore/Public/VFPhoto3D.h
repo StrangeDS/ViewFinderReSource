@@ -10,7 +10,7 @@
 #include "VFPhoto3D.generated.h"
 
 UENUM(BlueprintType)
-enum class EVF_PhotoState : uint8
+enum class EVFPhotoState : uint8
 {
 	None,
 	Folded,
@@ -49,7 +49,7 @@ public:
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ViewFinder")
-	EVF_PhotoState State = EVF_PhotoState::None;
+	EVFPhotoState State = EVFPhotoState::None;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "ViewFinder")
 	TObjectPtr<UStaticMeshComponent> StaticMesh;

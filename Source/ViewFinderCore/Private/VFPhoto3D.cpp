@@ -33,9 +33,9 @@ void AVFPhoto3D::Tick(float DeltaTime)
 
 void AVFPhoto3D::FoldUp()
 {
-	if (State == EVF_PhotoState::Folded)
+	if (State == EVFPhotoState::Folded)
 		return;
-	State = EVF_PhotoState::Folded;
+	State = EVFPhotoState::Folded;
 
 	SetVFDMCompsEnabled(false);
 	TArray<AActor *> Actors;
@@ -49,9 +49,9 @@ void AVFPhoto3D::FoldUp()
 
 void AVFPhoto3D::PlaceDown()
 {
-	if (State == EVF_PhotoState::Placed)
+	if (State == EVFPhotoState::Placed)
 		return;
-	State = EVF_PhotoState::Placed;
+	State = EVFPhotoState::Placed;
 
 	TArray<UPrimitiveComponent *> OverlapComps;
 	UKismetSystemLibrary::ComponentOverlapComponents(

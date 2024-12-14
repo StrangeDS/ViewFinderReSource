@@ -16,7 +16,6 @@ AVFPhotoContainer::AVFPhotoContainer()
 
 	static ConstructorHelpers::FObjectFinder<UInputMappingContext> Selector(
 		TEXT("/Game/ViewFinder/Input/IMC_PhotoContainer.IMC_PhotoContainer"));
-	UE_LOG(LogTemp, Warning, TEXT("Selector: %i"), Selector.Succeeded());
 	MappingContext = Selector.Object;
 }
 
