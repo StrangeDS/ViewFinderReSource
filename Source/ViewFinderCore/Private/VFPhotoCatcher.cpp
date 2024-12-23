@@ -150,7 +150,8 @@ AVFPhoto2D *AVFPhotoCatcher::TakeAPhoto_Implementation()
 	{
 		for (auto &Comp : VFDMComps)
 		{
-			UVFFunctions::SubtractWithFrustum(Comp, ViewFrustum);
+			// UVFFunctions::SubtractWithFrustum(Comp, ViewFrustum);
+			Comp->SubtractMeshWithDMComp(ViewFrustum);
 		}
 		for (auto &Helper : HelpersRecorder)
 		{
@@ -161,7 +162,9 @@ AVFPhoto2D *AVFPhotoCatcher::TakeAPhoto_Implementation()
 	// 新VFDynamicMeshComponent做交集
 	for (auto &Comp : CopiedComps)
 	{
-		UVFFunctions::IntersectWithFrustum(Comp, ViewFrustum);
+		// UVFFunctions::IntersectWithFrustum(Comp, ViewFrustum);
+		Comp->IntersectMeshWithDMComp(ViewFrustum);
+		// Comp->bNeedUnionToSource = bCuttingOrignal;
 	}
 	for (auto &Helper : CopiedHelpersRecorder)
 	{

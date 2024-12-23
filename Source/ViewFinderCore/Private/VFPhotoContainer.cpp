@@ -15,7 +15,7 @@ AVFPhotoContainer::AVFPhotoContainer()
 	Container->SetupAttachment(RootComponent);
 
 	static ConstructorHelpers::FObjectFinder<UInputMappingContext> Selector(
-		TEXT("/Game/ViewFinder/Input/IMC_PhotoContainer.IMC_PhotoContainer"));
+		TEXT("/Game/ViewFinder/Input/PhotoContainer/IMC_PhotoContainer.IMC_PhotoContainer"));
 	MappingContext = Selector.Object;
 }
 

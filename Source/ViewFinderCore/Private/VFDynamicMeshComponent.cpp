@@ -3,8 +3,8 @@
 
 #include "VFGeometryFunctions.h"
 
-
 UVFDynamicMeshComponent::UVFDynamicMeshComponent(const FObjectInitializer &ObjectInitializer)
+    : UDynamicMeshComponent(ObjectInitializer)
 {
     SetMobility(EComponentMobility::Movable);
 }
@@ -70,8 +70,53 @@ void UVFDynamicMeshComponent::CopyMeshFromComponent(UPrimitiveComponent *Source)
 
     // 复制材质
     SetMaterial(0, SourceComponent->GetMaterial(0));
-    
+
     // TODO: 传递事件. 暂使用Actor接口
+}
+
+void UVFDynamicMeshComponent::IntersectMeshWithDMComp(UDynamicMeshComponent *Tool)
+{
+    static FVF_GeometryScriptMeshBooleanOptions Options;
+    static EVF_GeometryScriptBooleanOperation Operation =
+        EVF_GeometryScriptBooleanOperation::Intersection;
+    UVFGeometryFunctions::ApplyMeshBoolean(
+        MeshObject,
+        GetComponentToWorld(),
+        Tool->GetDynamicMesh(),
+        Tool->GetComponentToWorld(),
+        Operation,
+        Options);
+    UpdateSimlpeCollision();
+}
+
+void UVFDynamicMeshComponent::SubtractMeshWithDMComp(UDynamicMeshComponent *Tool)
+{
+    static FVF_GeometryScriptMeshBooleanOptions Options;
+    static EVF_GeometryScriptBooleanOperation Operation =
+        EVF_GeometryScriptBooleanOperation::Subtract;
+    UVFGeometryFunctions::ApplyMeshBoolean(
+        MeshObject,
+        GetComponentToWorld(),
+        Tool->GetDynamicMesh(),
+        Tool->GetComponentToWorld(),
+        Operation,
+        Options);
+    UpdateSimlpeCollision();
+}
+
+void UVFDynamicMeshComponent::UnionMeshWithDMComp(UDynamicMeshComponent *Tool)
+{
+    static FVF_GeometryScriptMeshBooleanOptions Options;
+    static EVF_GeometryScriptBooleanOperation Operation =
+        EVF_GeometryScriptBooleanOperation::Union;
+    UVFGeometryFunctions::ApplyMeshBoolean(
+        MeshObject,
+        GetComponentToWorld(),
+        Tool->GetDynamicMesh(),
+        Tool->GetComponentToWorld(),
+        Operation,
+        Options);
+    UpdateSimlpeCollision();
 }
 
 void UVFDynamicMeshComponent::UpdateSimlpeCollision()
@@ -109,7 +154,7 @@ void UVFDynamicMeshComponent::SetEnabled(bool Enabled)
     if (bEnabled == Enabled)
         return;
     bEnabled = Enabled;
-    
+
     if (bEnabled)
     {
         SetSimulatePhysics(bSimulatePhysicsRecorder);
@@ -129,9 +174,9 @@ UPrimitiveComponent *UVFDynamicMeshComponent::GetSourceComponent()
     return SourceComponent;
 }
 
-bool UVFDynamicMeshComponent::IsSourceVFDMComp()
+UVFDynamicMeshComponent *UVFDynamicMeshComponent::GetSourceVFDMComp()
 {
     if (!SourceComponent)
-        return false;
-    return SourceComponent->GetClass()->IsChildOf(UVFDynamicMeshComponent::StaticClass());
+        return nullptr;
+    return Cast<UVFDynamicMeshComponent>(SourceComponent);
 }

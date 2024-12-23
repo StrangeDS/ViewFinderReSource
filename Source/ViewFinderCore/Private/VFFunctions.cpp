@@ -216,13 +216,15 @@ AVFPhoto3D *UVFFunctions::TakeAPhoto(UVFViewFrustumComponent *ViewFrustum, const
 		// 原网格, 与视锥求差
 		for (auto &Comp : VFDMComps)
 		{
-			SubtractWithFrustum(Comp, ViewFrustum);
+			Comp->SubtractMeshWithDMComp(ViewFrustum);
+			// SubtractWithFrustum(Comp, ViewFrustum);
 		}
 
 		// 复制出的网格, 与视锥求交集
 		for (auto &Comp : CopiedComps)
 		{
-			IntersectWithFrustum(Comp, ViewFrustum);
+			Comp->IntersectMeshWithDMComp(ViewFrustum);
+			// IntersectWithFrustum(Comp, ViewFrustum);
 		}
 	}
 	Photo->FoldUp();
