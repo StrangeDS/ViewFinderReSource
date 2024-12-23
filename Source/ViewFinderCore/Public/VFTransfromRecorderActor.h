@@ -1,42 +1,80 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+
 #include "VFStepsRecordInterface.h"
+#include "VFStepsRecorderWorldSubsystem.h"
 
 #include "VFTransfromRecorderActor.generated.h"
+
+USTRUCT(BlueprintType)
+struct FVFTransCompInfo
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "ViewFinder")
+	TObjectPtr<USceneComponent> Component;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "ViewFinder")
+	FTransform Transform;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "ViewFinder")
+	FVector Velocity;
+
+	FVFTransCompInfo() {}
+	FVFTransCompInfo(USceneComponent *Comp) : Component(Comp),
+											  Transform(Comp->GetComponentTransform()),
+											  Velocity(Comp->GetComponentVelocity()) {};
+
+	bool operator==(const FVFTransCompInfo &Other) const;
+};
+
+USTRUCT(BlueprintType)
+struct FVFTransStepInfo
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "ViewFinder")
+	float Time = 0.f;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "ViewFinder")
+	TArray<FVFTransCompInfo> Infos;
+
+	FVFTransStepInfo() {};
+	FVFTransStepInfo(float TimeIn, TArray<FVFTransCompInfo> InfosIn) : Time(TimeIn),
+																	   Infos(InfosIn) {};
+};
 
 UCLASS(Blueprintable, ClassGroup = (ViewFinder))
 class VIEWFINDERCORE_API AVFTransfromRecorderActor : public AActor, public IVFStepsRecordInterface
 {
 	GENERATED_BODY()
-	
-public:	
+
+public:
 	AVFTransfromRecorderActor();
 
 protected:
 	virtual void BeginPlay() override;
 
-public:	
+public:
 	virtual void Tick(float DeltaTime) override;
 
-	// 筛选: 哪些物体需要被记录Transform. 默认实现为所有的AStaticMeshActor
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "ViewFinder")
 	void ReCollectComponents();
 	void ReCollectComponents_Implementation();
 
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ViewFinder")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "ViewFinder")
 	TArray<TObjectPtr<USceneComponent>> Components;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ViewFinder")
-	TMap<TObjectPtr<USceneComponent>, FTransform> TransMap;
+	// 反射不支持
+	// UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ViewFinder")
+	TMap<TObjectPtr<USceneComponent>, FVFTransCompInfo> CompInfoMap;
 
-// Implements IVFStepsRecordInterface:
-public:
-	virtual FVFStepInfo MakeStepInfo_Implementation() override;
-	
-	virtual bool StepBack_Implementation(FString &Step) override;
+public: // Implements IVFStepsRecordInterface:
+	virtual void TickForward_Implementation(float Time) override;
+	virtual void TickBackward_Implementation(float Time) override;
+	TObjectPtr<UVFStepsRecorderWorldSubsystem> StepsRecorder;
+	TArray<FVFTransStepInfo> Steps;
 };
