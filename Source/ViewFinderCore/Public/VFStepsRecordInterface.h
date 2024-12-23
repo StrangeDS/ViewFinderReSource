@@ -5,32 +5,26 @@
 #include "VFStepsRecordInterface.generated.h"
 
 USTRUCT(BlueprintType)
-struct FVFStepObjectInfo
-{
-	GENERATED_BODY()
-
-public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ViewFinder")
-	TObjectPtr<UObject> Object;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ViewFinder")
-	FString Info;
-};
-
-USTRUCT(BlueprintType)
 struct FVFStepInfo
 {
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ViewFinder")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "ViewFinder")
+	FString Info;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "ViewFinder")
+	bool bIsKeyFrame = false;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "ViewFinder")
 	float Time = 0.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ViewFinder")
-	TArray<FVFStepObjectInfo> Events;
+	// 由UVFStepsRecorderWorldSubsystem填入
+	UPROPERTY(BlueprintReadWrite, Category = "ViewFinder")
+	TObjectPtr<UObject> Sender;
 };
 
-UINTERFACE(MinimalAPI)
+UINTERFACE(MinimalAPI, Blueprintable)
 class UVFStepsRecordInterface : public UInterface
 {
 	GENERATED_BODY()
@@ -41,15 +35,18 @@ class VIEWFINDERCORE_API IVFStepsRecordInterface
 	GENERATED_BODY()
 
 public:
+	// 访问者模式
+	// 由UVFStepsRecorderWorldSubsystem进行tick(forward/backword), 需要手动注册
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ViewFinder")
-	FVFStepInfo MakeStepInfo();
-	virtual FVFStepInfo MakeStepInfo_Implementation();
+	void TickForward(float Time);
+	virtual void TickForward_Implementation(float Time) {};
 
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ViewFinder")
-	bool StepBack(FString &Step);
-	virtual bool StepBack_Implementation(FString &Step);
+	void TickBackward(float Time);
+	virtual void TickBackward_Implementation(float Time) {};
 
+	// 向UVFStepsRecorderWorldSubsystem::SubmitChanges()的, 在此退回,
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ViewFinder")
-	bool WhetherToTick();
-	virtual bool WhetherToTick_Implementation();
+	bool StepBack(FVFStepInfo &StepInfo);
+	virtual bool StepBack_Implementation(FVFStepInfo &StepInfo);
 };
