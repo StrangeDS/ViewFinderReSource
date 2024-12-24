@@ -2,6 +2,8 @@
 
 #include "Kismet/GameplayStatics.h"
 
+#include "VFTransfromRecorderActor.h"
+
 TStatId UVFStepsRecorderWorldSubsystem::GetStatId() const
 {
     RETURN_QUICK_DECLARE_CYCLE_STAT(UVFStepsRecorderWorldSubsystem, STATGROUP_Tickables);
@@ -43,7 +45,7 @@ void UVFStepsRecorderWorldSubsystem::Tick(float DeltaTime)
 
 void UVFStepsRecorderWorldSubsystem::TickForward(float DeltaTime)
 {
-    Time = FMath::Clamp(Time, TIME_MIN, TIME_MAX);
+    Time = FMath::Min(Time, TIME_MAX);
 
     for (const auto &Target : TickTargets)
     {
@@ -83,10 +85,33 @@ void UVFStepsRecorderWorldSubsystem::SubmitStep(UObject *Sender, FVFStepInfo &In
     Infos.Add(Info);
 }
 
+void UVFStepsRecorderWorldSubsystem::RecordTransform(USceneComponent *Component)
+{
+    if (ensure(TransformRecorder))
+    {
+        TransformRecorder->AddToRecord(Component);
+    }
+}
+
+void UVFStepsRecorderWorldSubsystem::UnrecordTransform(USceneComponent *Component)
+{
+    if (ensure(TransformRecorder))
+    {
+        TransformRecorder->RemoveFromRecord(Component);
+    }
+}
+
 void UVFStepsRecorderWorldSubsystem::RegisterTickable(TScriptInterface<IVFStepsRecordInterface> Target)
 {
     check(Target.GetObject()->Implements<UVFStepsRecordInterface>());
     TickTargets.AddUnique(Target);
+}
+
+void UVFStepsRecorderWorldSubsystem::RegisterTransformRecordere(AVFTransfromRecorderActor *Recorder)
+{
+    check(Recorder);
+    TransformRecorder = Recorder;
+    RegisterTickable(TransformRecorder);
 }
 
 void UVFStepsRecorderWorldSubsystem::UnregisterTickable(TScriptInterface<IVFStepsRecordInterface> Target)
@@ -121,7 +146,7 @@ void UVFStepsRecorderWorldSubsystem::RewindToLastKey()
         if (Infos[i].bIsKeyFrame)
         {
             float TimeSpan = (Time - Infos[i].Time - TickInterval);
-            TimeSpan = FMath::Max(TimeSpan, TIME_MIN);
+            TimeSpan = FMath::Max(TimeSpan, TickInterval);
             TimeSpan = FMath::Min(TimeSpan, TimeOfRewindToLastKey);
             float Speed = TimeSpan / TimeOfRewindToLastKey;
             RewindCurFactor = Speed;

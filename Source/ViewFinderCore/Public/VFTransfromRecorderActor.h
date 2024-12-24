@@ -54,11 +54,16 @@ class VIEWFINDERCORE_API AVFTransfromRecorderActor : public AActor, public IVFSt
 public:
 	AVFTransfromRecorderActor();
 
-protected:
 	virtual void BeginPlay() override;
 
-public:
 	virtual void Tick(float DeltaTime) override;
+
+public:
+	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
+	void AddToRecord(USceneComponent* Component);
+	
+	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
+	void RemoveFromRecord(USceneComponent* Component);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "ViewFinder")
 	void ReCollectComponents();
@@ -68,8 +73,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "ViewFinder")
 	TArray<TObjectPtr<USceneComponent>> Components;
 
-	// 反射不支持
-	// UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ViewFinder")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ViewFinder")
 	TMap<TObjectPtr<USceneComponent>, FVFTransCompInfo> CompInfoMap;
 
 public: // Implements IVFStepsRecordInterface:

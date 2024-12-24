@@ -23,15 +23,27 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 public:
+	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
 	FORCEINLINE float GetTime() { return Time; }
 	
+	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
 	FORCEINLINE float GetDeltaTime() { return TickInterval; }
 
-	// 无需tick的可以在此提交
+	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
 	void SubmitStep(UObject *Sender, FVFStepInfo &Info);
 
-	// 未注册的瞬时Step
+	UPROPERTY(VisibleAnywhere, Category = "ViewFinder")
 	TArray<FVFStepInfo> Infos;
+
+public:
+	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
+	void RecordTransform(USceneComponent* Component);
+	
+	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
+	void UnrecordTransform(USceneComponent* Component);
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ViewFinder")
+	TObjectPtr<AVFTransfromRecorderActor> TransformRecorder;
 
 public:
 	void TickForward(float DeltaTime);
@@ -43,6 +55,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
 	void RegisterTickable(TScriptInterface<IVFStepsRecordInterface> Target);
+	
+	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
+	void RegisterTransformRecordere(AVFTransfromRecorderActor *Recorder);
 
 	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
 	void UnregisterTickable(TScriptInterface<IVFStepsRecordInterface> Target);

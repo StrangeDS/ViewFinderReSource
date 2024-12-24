@@ -22,9 +22,9 @@ bool FVFTransCompInfo::operator==(const FVFTransCompInfo &Other) const
 {
 	if (Component != Other.Component)
 		return false;
-	if (!IsTransformEqual(Transform, Other.Transform))
+	if (Velocity != Other.Velocity)
 		return false;
-	return Velocity == Other.Velocity;
+	return IsTransformEqual(Transform, Other.Transform);
 }
 
 AVFTransfromRecorderActor::AVFTransfromRecorderActor()
@@ -38,14 +38,24 @@ void AVFTransfromRecorderActor::BeginPlay()
 
 	StepsRecorder = GetWorld()->GetSubsystem<UVFStepsRecorderWorldSubsystem>();
 	check(StepsRecorder);
-	StepsRecorder->RegisterTickable(this);
-
 	ReCollectComponents();
+	StepsRecorder->RegisterTransformRecordere(this);
 }
 
 void AVFTransfromRecorderActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+}
+
+void AVFTransfromRecorderActor::AddToRecord(USceneComponent *Component)
+{
+	check(Component);
+	Components.AddUnique(Component);
+}
+
+void AVFTransfromRecorderActor::RemoveFromRecord(USceneComponent *Component)
+{
+	Components.Remove(Component);
 }
 
 void AVFTransfromRecorderActor::ReCollectComponents_Implementation()
@@ -73,23 +83,25 @@ void AVFTransfromRecorderActor::ReCollectComponents_Implementation()
 		CompInfoMap.Add(Comp, Info);
 		Infos.Add(Info);
 	}
-	FVFTransStepInfo StepInfo(StepsRecorder->GetTime(), Infos);
+	FVFTransStepInfo StepInfo(StepsRecorder->TIME_MIN, Infos);
 	Steps.Add(StepInfo);
 }
 
 void AVFTransfromRecorderActor::TickForward_Implementation(float Time)
 {
 	TArray<FVFTransCompInfo> Infos;
-	for (const TObjectPtr<USceneComponent> &Comp : Components)
+	for (auto It = Components.CreateIterator(); It; It++)
 	{
+		auto Comp = *It;
 		if (!Comp)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("AVFTransfromRecorderActor::TickForward_Implementation(): Comp销毁"));
+			It.RemoveCurrent();
 			continue;
 		}
 
 		auto Info = FVFTransCompInfo(Comp);
-		if (CompInfoMap[Comp] != Info)
+		if (!CompInfoMap.Contains(Comp) || CompInfoMap[Comp] != Info)
 		{
 			CompInfoMap[Comp] = Info;
 			Infos.Add(Info);
@@ -126,9 +138,19 @@ void AVFTransfromRecorderActor::TickBackward_Implementation(float Time)
 	}
 
 	auto TimeLast = Steps.Last().Time;
-	for (const auto &[Comp, Info] : CompInfoMap)
+
+	for (auto It = CompInfoMap.CreateIterator(); It; ++It)
 	{
+		auto &[Comp, Info] = *It;
+		if (!Comp) 
+		{
+			UE_LOG(LogTemp, Warning, TEXT("AVFTransfromRecorderActor::TickBackward_Implementation(): Comp销毁"));
+			It.RemoveCurrent();
+			continue;
+		}
+
 		auto Delta = StepsRecorder->GetDeltaTime() / (StepsRecorder->GetTime() - TimeLast);
+		Delta = FMath::Min(Delta, 1.0f);
 		Comp->SetWorldTransform(Lerp(Comp->GetComponentTransform(), Info.Transform, Delta));
 		Comp->ComponentVelocity = FMath::Lerp(Comp->GetComponentVelocity(), Info.Velocity, Delta);
 	}
