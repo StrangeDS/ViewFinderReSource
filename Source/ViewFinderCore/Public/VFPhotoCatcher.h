@@ -2,13 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "VFViewFrustumComponent.h"
 #include "VFPhotoCatcher.generated.h"
-
-
-
-class UStaticMeshComponent;
-class UVFPhotoCaptureComponent;
 
 UCLASS(Blueprintable, ClassGroup = (ViewFinder))
 class VIEWFINDERCORE_API AVFPhotoCatcher : public AActor
@@ -19,10 +13,6 @@ public:
 	AVFPhotoCatcher();
 
 	virtual void OnConstruction(const FTransform &Transform) override;
-
-// #if WITH_EDITOR
-// 	virtual void PostEditChangeProperty(FPropertyChangedEvent& Event) override;
-// #endif
 
 protected:
 	virtual void BeginPlay() override;
@@ -51,6 +41,15 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ViewFinder")
 	float EndDis = 1000.0f;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ViewFinder|ClassSetting")
+	TSubclassOf<class UVFDynamicMeshComponent> VFDMCompClass;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ViewFinder|ClassSetting")
+	TSubclassOf<class AVFPhoto2D> VFPhoto2DClass;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ViewFinder|ClassSetting")
+	TSubclassOf<class AVFPhoto3D> VFPhoto3DClass;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ViewFinder")
 	bool bOnlyOverlapWithHelps = false;
 	
@@ -65,11 +64,11 @@ protected:
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypesToOverlap;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ViewFinder")
-	TObjectPtr<UStaticMeshComponent> StaticMesh;
+	TObjectPtr<class UStaticMeshComponent> StaticMesh;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ViewFinder")
-	TObjectPtr<UVFPhotoCaptureComponent> PhotoCapture;
+	TObjectPtr<class UVFPhotoCaptureComponent> PhotoCapture;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ViewFinder")
-	TObjectPtr<UVFViewFrustumComponent> ViewFrustum;
+	TObjectPtr<class UVFViewFrustumComponent> ViewFrustum;
 };

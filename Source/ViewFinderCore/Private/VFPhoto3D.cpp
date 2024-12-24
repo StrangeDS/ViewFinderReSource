@@ -23,6 +23,8 @@ AVFPhoto3D::AVFPhoto3D()
 
 void AVFPhoto3D::BeginPlay()
 {
+	check(VFDMCompClass.Get());
+	
 	Super::BeginPlay();
 }
 
@@ -81,12 +83,12 @@ void AVFPhoto3D::PlaceDown()
 		HelpersRecorder.Add(Helper);
 	}
 
-	auto VFDMComps = UVFFunctions::CheckVFDMComps(OverlapComps);
+	auto VFDMComps = UVFFunctions::CheckVFDMComps(OverlapComps, VFDMCompClass);
 	UE_LOG(LogTemp, Warning, TEXT("PlaceDown overlaps %i"), VFDMComps.Num());
 
 	for (auto Comp : VFDMComps)
 	{
-		UVFFunctions::SubtractWithFrustum(Comp, ViewFrustumRecorder);
+		Comp->SubtractMeshWithDMComp(ViewFrustumRecorder);
 	}
 	for (auto &Helper : HelpersRecorder)
 	{

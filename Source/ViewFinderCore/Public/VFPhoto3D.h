@@ -47,6 +47,10 @@ public:
 	UFUNCTION(BlueprintCallable, CallInEditor, Category = "ViewFinder")
 	void SetVFDMCompsEnabled(const bool &Enabled);
 
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ViewFinde|ClassSettingr")
+	TSubclassOf<class UVFDynamicMeshComponent> VFDMCompClass;
+
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ViewFinder")
 	EVFPhotoState State = EVFPhotoState::None;

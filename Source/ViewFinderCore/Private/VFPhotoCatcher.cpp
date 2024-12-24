@@ -1,12 +1,13 @@
 #include "VFPhotoCatcher.h"
 
 #include "Components/StaticMeshComponent.h"
-#include "VFDynamicMeshComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 
+#include "VFDynamicMeshComponent.h"
 #include "VFPhoto2D.h"
 #include "VFPhoto3D.h"
 #include "VFPhotoCaptureComponent.h"
+#include "VFViewFrustumComponent.h"
 #include "VFFunctions.h"
 
 static void GetMapHelpers(
@@ -43,24 +44,12 @@ void AVFPhotoCatcher::OnConstruction(const FTransform &Transform)
 	PhotoCapture->Init(StaticMesh);
 }
 
-// #if WITH_EDITOR
-// void AVFPhotoCatcher::PostEditChangeProperty(FPropertyChangedEvent &Event)
-// {
-// 	const FName PropertyName = Event.Property ? Event.Property->GetFName(): NAME_None;
-// 	if (PropertyName == GET_MEMBER_NAME_CHECKED(AVFPhotoCatcher, ViewAngle)
-// 	|| PropertyName == GET_MEMBER_NAME_CHECKED(AVFPhotoCatcher, AspectRatio)
-// 	|| PropertyName == GET_MEMBER_NAME_CHECKED(AVFPhotoCatcher, StartDis)
-// 	|| PropertyName == GET_MEMBER_NAME_CHECKED(AVFPhotoCatcher, EndDis))
-// 	{
-// 		ViewFrustum->RegenerateViewFrustum(ViewAngle, AspectRatio, StartDis, EndDis);
-// 	}
-
-// 	Super::PostEditChangeProperty(Event);
-// }
-// #endif
-
 void AVFPhotoCatcher::BeginPlay()
 {
+	check(VFDMCompClass.Get());
+	check(VFPhoto2DClass.Get());
+	check(VFPhoto3DClass.Get());
+
 	Super::BeginPlay();
 
 	SetViewFrustumVisible(false);
@@ -74,6 +63,7 @@ void AVFPhotoCatcher::Tick(float DeltaTime)
 AVFPhoto2D *AVFPhotoCatcher::TakeAPhoto_Implementation()
 {
 	TRACE_CPUPROFILER_EVENT_SCOPE(TEXT("AVFPhotoCatcher::TakeAPhoto_Implementation()"));
+
 	// 重叠检测
 	TArray<UPrimitiveComponent *> OverlapComps;
 	UKismetSystemLibrary::ComponentOverlapComponents(
@@ -114,7 +104,8 @@ AVFPhoto2D *AVFPhotoCatcher::TakeAPhoto_Implementation()
 	}
 
 	// 基元组件下创建对应VFDynamicMeshComponent
-	auto VFDMComps = UVFFunctions::CheckVFDMComps(OverlapComps);
+	auto VFDMComps = UVFFunctions::CheckVFDMComps(OverlapComps, VFDMCompClass);
+
 	// 需要排序吗?
 	// Algo::Sort(VFDMComps, [](UVFDynamicMeshComponent *A, UVFDynamicMeshComponent *B)
 	// 			{ return A->GetOwner()->GetName() < B->GetOwner()->GetName(); });
@@ -122,6 +113,7 @@ AVFPhoto2D *AVFPhotoCatcher::TakeAPhoto_Implementation()
 	// {
 	// 	UE_LOG(LogTemp, Warning, TEXT("%s"), *Comp->GetOwner()->GetName());
 	// }
+
 	UE_LOG(LogTemp, Warning, TEXT("TakeAPhoto_Implementation overlaps %i"), VFDMComps.Num());
 	
 	for (auto &Helper : HelpersRecorder)
@@ -131,6 +123,7 @@ AVFPhoto2D *AVFPhotoCatcher::TakeAPhoto_Implementation()
 	// 复制对应Actor
 	TArray<UVFDynamicMeshComponent *> CopiedComps;
 	AVFPhoto3D *Photo3D = GetWorld()->SpawnActor<AVFPhoto3D>(
+		VFPhoto3DClass.Get(),
 		ViewFrustum->GetComponentLocation(),
 		ViewFrustum->GetComponentRotation());
 	auto ActorsCopied = UVFFunctions::CopyActorFromVFDMComps(Photo3D, VFDMComps, CopiedComps);
@@ -150,7 +143,6 @@ AVFPhoto2D *AVFPhotoCatcher::TakeAPhoto_Implementation()
 	{
 		for (auto &Comp : VFDMComps)
 		{
-			// UVFFunctions::SubtractWithFrustum(Comp, ViewFrustum);
 			Comp->SubtractMeshWithDMComp(ViewFrustum);
 		}
 		for (auto &Helper : HelpersRecorder)
@@ -162,9 +154,7 @@ AVFPhoto2D *AVFPhotoCatcher::TakeAPhoto_Implementation()
 	// 新VFDynamicMeshComponent做交集
 	for (auto &Comp : CopiedComps)
 	{
-		// UVFFunctions::IntersectWithFrustum(Comp, ViewFrustum);
 		Comp->IntersectMeshWithDMComp(ViewFrustum);
-		// Comp->bNeedUnionToSource = bCuttingOrignal;
 	}
 	for (auto &Helper : CopiedHelpersRecorder)
 	{
@@ -173,6 +163,7 @@ AVFPhoto2D *AVFPhotoCatcher::TakeAPhoto_Implementation()
 
 	// 创建照片, 后续处理
 	AVFPhoto2D *Photo2D = GetWorld()->SpawnActor<AVFPhoto2D>(
+		VFPhoto2DClass.Get(),
 		ViewFrustum->GetComponentLocation(),
 		ViewFrustum->GetComponentRotation());
 	Photo2D->SetPhoto3D(Photo3D);
