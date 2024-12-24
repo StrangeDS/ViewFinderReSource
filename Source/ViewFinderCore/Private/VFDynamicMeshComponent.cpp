@@ -1,4 +1,3 @@
-
 #include "VFDynamicMeshComponent.h"
 
 #include "VFGeometryFunctions.h"

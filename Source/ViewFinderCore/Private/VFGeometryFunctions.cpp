@@ -260,6 +260,9 @@ UDynamicMesh *UVFGeometryFunctions::ApplyMeshBoolean(
 	case EVF_GeometryScriptBooleanOperation::Subtract:
 		ApplyOperation = FMeshBoolean::EBooleanOp::Difference;
 		break;
+	case EVF_GeometryScriptBooleanOperation::Union:
+		ApplyOperation = FMeshBoolean::EBooleanOp::Union;
+		break;
 	}
 
 	FDynamicMesh3 NewResultMesh;

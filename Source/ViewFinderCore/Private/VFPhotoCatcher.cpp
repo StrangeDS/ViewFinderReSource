@@ -126,7 +126,11 @@ AVFPhoto2D *AVFPhotoCatcher::TakeAPhoto_Implementation()
 		VFPhoto3DClass.Get(),
 		ViewFrustum->GetComponentLocation(),
 		ViewFrustum->GetComponentRotation());
-	auto ActorsCopied = UVFFunctions::CopyActorFromVFDMComps(Photo3D, VFDMComps, CopiedComps);
+	auto ActorsCopied = UVFFunctions::CopyActorFromVFDMComps(GetWorld(), VFDMComps, CopiedComps);
+	for (auto &Actor : ActorsCopied)
+	{
+		Actor->AttachToActor(Photo3D, FAttachmentTransformRules::KeepWorldTransform);
+	}
 
 	TMap<UPrimitiveComponent *, UVFHelperComponent *> CopiedHelperMap;
 	UVFFunctions::GetCompsToHelpersMapping<UVFDynamicMeshComponent>(CopiedComps, CopiedHelperMap);
