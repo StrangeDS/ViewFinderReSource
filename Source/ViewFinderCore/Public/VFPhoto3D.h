@@ -1,27 +1,21 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-
-#include "VFStepsRecordInterface.h"
-
 #include "VFPhoto3D.generated.h"
 
 UENUM(BlueprintType)
-enum class EVFPhotoState : uint8
+enum class EVFPhoto3DState : uint8
 {
 	None,
 	Folded,
 	Placed
 };
 
-class UTextureRenderTarget2D;
 class UVFDynamicMeshComponent;
 
 UCLASS(Blueprintable, ClassGroup = (ViewFinder))
-class VIEWFINDERCORE_API AVFPhoto3D : public AActor, public IVFStepsRecordInterface
+class VIEWFINDERCORE_API AVFPhoto3D : public AActor
 {
 	GENERATED_BODY()
 
@@ -36,10 +30,10 @@ public:
 
 public:
 	UFUNCTION(BlueprintCallable, CallInEditor, Category = "ViewFinder")
-	void FoldUp();
+	virtual void FoldUp();
 
 	UFUNCTION(BlueprintCallable, CallInEditor, Category = "ViewFinder")
-	void PlaceDown();
+	virtual void PlaceDown();
 	
 	UFUNCTION(BlueprintCallable, CallInEditor, Category = "ViewFinder")
 	void SetViewFrustumVisible(const bool &Visiblity);
@@ -53,19 +47,13 @@ public:
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ViewFinder")
-	EVFPhotoState State = EVFPhotoState::None;
+	EVFPhoto3DState State = EVFPhoto3DState::None;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "ViewFinder")
 	TObjectPtr<UStaticMeshComponent> StaticMesh;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "ViewFinder")
 	TObjectPtr<UVFViewFrustumComponent> ViewFrustumRecorder;
-
-	// UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ViewFinder")
-	// TEnumAsByte<ETextureRenderTargetFormat> Format;
-
-	// UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "ViewFinder")
-	// TArray<TObjectPtr<UVFDynamicMeshComponent>> VFDMComps;
 
 public:	// 记录属性
 	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
