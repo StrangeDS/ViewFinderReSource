@@ -81,11 +81,8 @@ bool UVFDMSteppableComponent::StepBack_Implementation(FVFStepInfo &StepInfo)
         break;
     }
     default:
-    {
-        UE_LOG(LogTemp, Warning, TEXT("VFDMSteppableComponent.cpp StepBack_Implementation() not implements all."));
-        break;
-    }
+    return false;
     }
 
-    return false;
+    return true;
 }

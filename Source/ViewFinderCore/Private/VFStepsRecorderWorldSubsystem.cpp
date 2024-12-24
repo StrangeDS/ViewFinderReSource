@@ -29,7 +29,7 @@ void UVFStepsRecorderWorldSubsystem::Tick(float DeltaTime)
     TimeSinceLastTick += bIsRewinding ? DeltaTime * RewindCurFactor : DeltaTime;
     while (TimeSinceLastTick > TickInterval)
     {
-        Time += bIsRewinding ? -TickInterval: TickInterval;
+        Time += bIsRewinding ? -TickInterval : TickInterval;
         if (bIsRewinding)
         {
             TickBackward(TickInterval);
@@ -68,7 +68,16 @@ void UVFStepsRecorderWorldSubsystem::TickBackward(float DeltaTime)
         if (Info.Time < Time)
             break;
 
-        IVFStepsRecordInterface::Execute_StepBack(Info.Sender, Info);
+        bool handled = IVFStepsRecordInterface::Execute_StepBack(Info.Sender, Info);
+        if (!handled)
+        {
+            UE_LOG(
+                LogTemp,
+                Warning,
+                TEXT("UVFStepsRecorderWorldSubsystem::TickBackward(): StepInfo(%s) from %s does not get handled"),
+                *Info.Info,
+                *Info.Sender->GetName());
+        }
         Infos.Pop(false);
     }
 
@@ -80,6 +89,9 @@ void UVFStepsRecorderWorldSubsystem::TickBackward(float DeltaTime)
 
 void UVFStepsRecorderWorldSubsystem::SubmitStep(UObject *Sender, FVFStepInfo Info)
 {
+    // if (bIsRewinding)   // 是否有必要? 可以在很多地方避免此判断, 但会削减游戏更多的可能性
+    //     return;
+
     Info.Sender = Sender;
     Info.Time = Time;
     Infos.Add(Info);
@@ -153,10 +165,10 @@ void UVFStepsRecorderWorldSubsystem::RewindToLastKey()
             RewindCurFactor = Speed;
             StartRewinding();
             GetWorld()->GetTimerManager().SetTimer(
-                RewindHandle, [this]() {
+                RewindHandle, [this]()
+                {
                     RewindCurFactor = RewindFactor;
-                    EndRewinding();
-                },
+                    EndRewinding(); },
                 TimeOfRewindToLastKey,
                 false);
             return;
