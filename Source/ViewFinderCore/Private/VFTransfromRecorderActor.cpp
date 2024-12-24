@@ -103,7 +103,7 @@ void AVFTransfromRecorderActor::TickForward_Implementation(float Time)
 		auto Info = FVFTransCompInfo(Comp);
 		if (!CompInfoMap.Contains(Comp) || CompInfoMap[Comp] != Info)
 		{
-			CompInfoMap[Comp] = Info;
+			CompInfoMap.Add(Comp, Info);
 			Infos.Add(Info);
 		}
 	}

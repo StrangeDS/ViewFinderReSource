@@ -78,7 +78,7 @@ void UVFStepsRecorderWorldSubsystem::TickBackward(float DeltaTime)
     }
 }
 
-void UVFStepsRecorderWorldSubsystem::SubmitStep(UObject *Sender, FVFStepInfo &Info)
+void UVFStepsRecorderWorldSubsystem::SubmitStep(UObject *Sender, FVFStepInfo Info)
 {
     Info.Sender = Sender;
     Info.Time = Time;
@@ -89,7 +89,8 @@ void UVFStepsRecorderWorldSubsystem::RecordTransform(USceneComponent *Component)
 {
     if (ensure(TransformRecorder))
     {
-        TransformRecorder->AddToRecord(Component);
+        if (Component->Mobility == EComponentMobility::Movable)
+            TransformRecorder->AddToRecord(Component);
     }
 }
 

@@ -26,7 +26,10 @@ TArray<UPrimitiveComponent *> AVFTransformRecordVolume::GetComponents()
 
     for (auto It = OutComponents.CreateIterator(); It; It++)
     {
-        if ((*It)->Implements<UVFStepsRecordInterface>())
+        auto &Comp = (*It);
+        if (Comp->Implements<UVFStepsRecordInterface>())
+            It.RemoveCurrent();
+        if (Comp->Mobility != EComponentMobility::Movable)
             It.RemoveCurrent();
     }
 

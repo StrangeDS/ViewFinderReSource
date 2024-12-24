@@ -30,7 +30,7 @@ public:
 	FORCEINLINE float GetDeltaTime() { return TickInterval; }
 
 	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
-	void SubmitStep(UObject *Sender, FVFStepInfo &Info);
+	void SubmitStep(UObject *Sender, FVFStepInfo Info);
 
 	UPROPERTY(VisibleAnywhere, Category = "ViewFinder")
 	TArray<FVFStepInfo> Infos;
