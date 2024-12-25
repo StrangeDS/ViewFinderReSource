@@ -158,18 +158,18 @@ void UVFStepsRecorderWorldSubsystem::RewindToLastKey()
     {
         if (Infos[i].bIsKeyFrame)
         {
-            float TimeSpan = (Time - Infos[i].Time - TickInterval);
+            float TimeSpan = (Time - Infos[i].Time + TickInterval);
             TimeSpan = FMath::Max(TimeSpan, TickInterval);
-            TimeSpan = FMath::Min(TimeSpan, TimeOfRewindToLastKey);
             float Speed = TimeSpan / TimeOfRewindToLastKey;
+            Speed = FMath::Max(Speed, 1.0f);
             RewindCurFactor = Speed;
             StartRewinding();
             GetWorld()->GetTimerManager().SetTimer(
-                RewindHandle, [this]()
+                RewindHandle, [this, TimeSpan]()
                 {
                     RewindCurFactor = RewindFactor;
                     EndRewinding(); },
-                TimeOfRewindToLastKey,
+                FMath::Min(TimeSpan, TimeOfRewindToLastKey),
                 false);
             return;
         }

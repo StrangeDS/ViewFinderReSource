@@ -13,7 +13,7 @@ void UVFDMSteppableComponent::BeginPlay()
     check(StepRecorder);
     StepRecorder->SubmitStep(
         this,
-        FVFStepInfo{ToString(UVFDMSteppableCompStep::BeginPlay), true});
+        FVFStepInfo{ToString(UVFDMSteppableCompStep::BeginPlay)});
 }
 
 void UVFDMSteppableComponent::CopyMeshFromComponent(UPrimitiveComponent *Source)

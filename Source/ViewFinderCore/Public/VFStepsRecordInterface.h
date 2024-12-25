@@ -48,7 +48,7 @@ public:
 	// 向UVFStepsRecorderWorldSubsystem::SubmitChanges()的, 在此退回,
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ViewFinder")
 	bool StepBack(FVFStepInfo &StepInfo);
-	virtual bool StepBack_Implementation(FVFStepInfo &StepInfo);
+	virtual bool StepBack_Implementation(FVFStepInfo &StepInfo) { return false; };
 
 	template <typename T>
 	static FString EnumToString(T &&Step);
