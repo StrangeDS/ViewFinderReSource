@@ -28,8 +28,11 @@ AVFPhotoCatcher::AVFPhotoCatcher()
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
 	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
 	StaticMesh->SetupAttachment(RootComponent);
+	StaticMesh->SetCollisionProfileName(TEXT("OverlapOnlyPawn"));
+
 	PhotoCapture = CreateDefaultSubobject<UVFPhotoCaptureComponent>(TEXT("PhotoCapture"));
 	PhotoCapture->SetupAttachment(RootComponent);
+	
 	ViewFrustum = CreateDefaultSubobject<UVFViewFrustumComponent>(TEXT("ViewFrustum"));
 	ViewFrustum->SetupAttachment(RootComponent);
 }

@@ -9,7 +9,7 @@ bool AVFPhotoCatcher_Interact::StartAiming_Implementation(APlayerController *Con
 		return false;
 
 	if (!AimingHintUMG)
-		AimingHintUMG = CreateWidget<UUserWidget>(GetWorld(), AimingHintUMGClass, TEXT("HintUMG"));
+		AimingHintUMG = CreateWidget<UUserWidget>(GetWorld(), AimingHintUMGClass);
 	AimingHintUMG->AddToViewport();
 
 	if (AimingMappingContext)

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "VFPhotoCatcher.h"
+#include "VFPhotoCatcherSteppable.h"
 
 #include "VFInteractInterface.h"
 
@@ -10,7 +10,7 @@
 class UUserWidget;
 
 UCLASS(Blueprintable, ClassGroup = (ViewFinder))
-class VIEWFINDERDEMO_API AVFPhotoCatcher_Interact : public AVFPhotoCatcher, public IVFInteractInterface
+class VIEWFINDERDEMO_API AVFPhotoCatcher_Interact : public AVFPhotoCatcherSteppable, public IVFInteractInterface
 {
 	GENERATED_BODY()
 	
