@@ -3,6 +3,7 @@
 #include "Components/BoxComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 
+#include "VFHelperComponent.h"
 #include "VFStepsRecordInterface.h"
 
 AVFTransformRecordVolume::AVFTransformRecordVolume(const FObjectInitializer &ObjectInitializer)
@@ -10,7 +11,12 @@ AVFTransformRecordVolume::AVFTransformRecordVolume(const FObjectInitializer &Obj
 {
     PrimaryActorTick.bCanEverTick = false;
 	Volume = CreateDefaultSubobject<UBoxComponent>("Volume");
-    RootComponent = Volume;
+    SetRootComponent(Volume);
+    Volume->SetHiddenInGame(true);
+
+    Helper = CreateDefaultSubobject<UVFHelperComponent>("Helper");
+    Helper->bCanBeTakenInPhoto = false;
+    Helper->bCanBePlacedByPhoto = false;
 }
 
 TArray<UPrimitiveComponent *> AVFTransformRecordVolume::GetComponents()

@@ -19,9 +19,12 @@ public:
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ViewFinder")
-	TSubclassOf<UPrimitiveComponent> CompClass = TSubclassOf<UPrimitiveComponent>(UStaticMeshComponent::StaticClass());
+	TSubclassOf<UPrimitiveComponent> CompClass = UStaticMeshComponent::StaticClass();
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ViewFinder")
 	TObjectPtr<class UBoxComponent> Volume;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ViewFinder")
+	TObjectPtr<class UVFHelperComponent> Helper;
 };
