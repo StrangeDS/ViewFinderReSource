@@ -4,9 +4,6 @@
 #include "VFPhotoCatcher_Interact.h"
 #include "VFPhotoCatcher_PickUp.generated.h"
 
-// class UInputMappingContext;
-// class AVFPhotoContainer;
-
 UCLASS(Blueprintable, ClassGroup = (ViewFinder))
 class VIEWFINDERDEMO_API AVFPhotoCatcher_PickUp : public AVFPhotoCatcher_Interact
 {

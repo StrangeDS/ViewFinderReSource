@@ -13,6 +13,7 @@ bool AVFPhotoCatcher_PickUp::Interact_Implementation(APlayerController *Controll
     Execute_EndAiming(this, Controller);
     PlayerController = Controller;
     Pawn = PlayerController->GetPawn();
+    ActorsToIgnore.AddUnique(Pawn);
     // 需要根据角色重写
     if (auto ToAttach = Pawn->GetComponentByClass<UCameraComponent>())
     {
@@ -105,6 +106,7 @@ void AVFPhotoCatcher_PickUp::DropDown_Implementation()
         if (Subsystem)
             Subsystem->RemoveMappingContext(HoldingMappingContext);
     }
+    ActorsToIgnore.AddUnique(GetAttachParentActor());
     DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 
     Pawn = nullptr;
