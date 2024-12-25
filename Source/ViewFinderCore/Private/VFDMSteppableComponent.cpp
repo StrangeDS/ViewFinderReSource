@@ -1,15 +1,5 @@
 #include "VFDMSteppableComponent.h"
 
-static FString ToString(UVFDMSteppableCompStep Step)
-{
-    return FString::FromInt((int)Step);
-};
-
-static UVFDMSteppableCompStep ToStep(FString String)
-{
-    return (UVFDMSteppableCompStep)FCString::Atoi(*String);
-};
-
 UVFDMSteppableComponent::UVFDMSteppableComponent(const FObjectInitializer &ObjectInitializer)
     : UVFDynamicMeshComponent(ObjectInitializer)
 {
@@ -85,4 +75,14 @@ bool UVFDMSteppableComponent::StepBack_Implementation(FVFStepInfo &StepInfo)
     }
 
     return true;
+}
+
+FString UVFDMSteppableComponent::ToString(UVFDMSteppableCompStep Step)
+{
+    return FString::FromInt((int)Step);
+}
+
+UVFDMSteppableCompStep UVFDMSteppableComponent::ToStep(FString String)
+{
+    return (UVFDMSteppableCompStep)FCString::Atoi(*String);
 }

@@ -38,4 +38,10 @@ public:
 
 	UPROPERTY(BlueprintReadOnly, Category = "ViewFinder")
 	TObjectPtr<UVFStepsRecorderWorldSubsystem> StepRecorder;
+
+	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
+	static FString ToString(UVFDMSteppableCompStep Step);
+	
+	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
+	static UVFDMSteppableCompStep ToStep(FString String);
 };

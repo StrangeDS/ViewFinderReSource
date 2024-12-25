@@ -1,15 +1,5 @@
 #include "VFPhoto3DSteppable.h"
 
-static FString ToString(EVFPhoto3DState Step)
-{
-    return FString::FromInt((int)Step);
-};
-
-static EVFPhoto3DState ToStep(FString String)
-{
-    return (EVFPhoto3DState)FCString::Atoi(*String);
-};
-
 void AVFPhoto3DSteppable::BeginPlay()
 {
 	Super::BeginPlay();
@@ -70,4 +60,14 @@ bool AVFPhoto3DSteppable::StepBack_Implementation(FVFStepInfo &StepInfo)
     }
 
     return true;
+}
+
+FString AVFPhoto3DSteppable::ToString(EVFPhoto3DState Step)
+{
+    return FString::FromInt((int)Step);
+}
+
+EVFPhoto3DState AVFPhoto3DSteppable::ToStep(FString String)
+{
+    return (EVFPhoto3DState)FCString::Atoi(*String);
 }
