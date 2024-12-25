@@ -49,4 +49,22 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ViewFinder")
 	bool StepBack(FVFStepInfo &StepInfo);
 	virtual bool StepBack_Implementation(FVFStepInfo &StepInfo);
+
+	template <typename T>
+	static FString EnumToString(T &&Step);
+
+	template <typename T>
+	static T StringToEnum(FString &String);
 };
+
+template <typename T>
+inline FString IVFStepsRecordInterface::EnumToString(T &&Step)
+{
+    return FString::FromInt((int)Step);
+}
+
+template <typename T>
+inline T IVFStepsRecordInterface::StringToEnum(FString &String)
+{
+    return (T)FCString::Atoi(*String);
+}
