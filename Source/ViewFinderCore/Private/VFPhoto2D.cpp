@@ -8,7 +8,7 @@
 
 AVFPhoto2D::AVFPhoto2D()
 {
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
 	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
@@ -36,7 +36,6 @@ void AVFPhoto2D::BeginPlay()
 void AVFPhoto2D::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 void AVFPhoto2D::SetPhoto3D(AVFPhoto3D *Photo)
@@ -71,6 +70,10 @@ void AVFPhoto2D::FoldUp()
 	if (!Photo3D)
 		return;
 
+	if (State == EVFPhoto2DState::Folded)
+		return;
+	State = EVFPhoto2DState::Folded;
+
 	Photo3D->FoldUp();
 }
 
@@ -87,6 +90,10 @@ void AVFPhoto2D::PlaceDown()
 {
 	if (!Photo3D)
 		return;
+
+	if (State == EVFPhoto2DState::Placed)
+		return;
+	State = EVFPhoto2DState::Placed;
 
 	Photo3D->PlaceDown();
 	SetActorHiddenInGame(true);

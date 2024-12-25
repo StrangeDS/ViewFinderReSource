@@ -4,9 +4,13 @@
 #include "GameFramework/Actor.h"
 #include "VFPhoto2D.generated.h"
 
-class AVFPhoto3D;
-class UTextureRenderTarget2D;
-class UVFDynamicMeshComponent;
+UENUM(BlueprintType)
+enum class EVFPhoto2DState : uint8
+{
+	None,
+	Folded,
+	Placed
+};
 
 UCLASS(Blueprintable, ClassGroup = (ViewFinder))
 class VIEWFINDERCORE_API AVFPhoto2D : public AActor
@@ -24,7 +28,7 @@ public:
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
-	void SetPhoto3D(AVFPhoto3D *Photo);
+	void SetPhoto3D(class AVFPhoto3D *Photo);
 
 	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
 	AVFPhoto3D *GetPhoto3D();
@@ -33,15 +37,18 @@ public:
 	void SetPhoto(USceneCaptureComponent2D *Capturer);
 
 	UFUNCTION(BlueprintCallable, CallInEditor, Category = "ViewFinder")
-	void FoldUp();
+	virtual void FoldUp();
 
 	UFUNCTION(BlueprintCallable, CallInEditor, Category = "ViewFinder")
 	void Preview(const FTransform& WorldTrans, const bool &Enabled);
 
 	UFUNCTION(BlueprintCallable, CallInEditor, Category = "ViewFinder")
-	void PlaceDown();
+	virtual void PlaceDown();
 
 protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ViewFinder")
+	EVFPhoto2DState State = EVFPhoto2DState::None;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ViewFinder")
 	TObjectPtr<class UStaticMeshComponent> StaticMesh;
 	
