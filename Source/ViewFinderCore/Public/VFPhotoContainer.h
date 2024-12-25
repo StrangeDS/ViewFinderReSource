@@ -23,28 +23,25 @@ public:
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
-	void AddAPhoto(AVFPhoto2D *Photo);
-	
-	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
-	void CreateAPhoto(const FTransform &WorldTrans);
+	virtual void AddAPhoto(AVFPhoto2D *Photo);
 
 	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
-	void PrepareCurrentPhoto(float Time = -1.0f);
+	virtual void PrepareCurrentPhoto(float Time = -1.0f);
 
 	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
-	void GiveUpPreparing();
+	virtual void GiveUpPreparing();
 
 	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
-	void PlaceCurrentPhoto();
+	virtual void PlaceCurrentPhoto();
 
 	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
-	void ChangeCurrentPhoto(const bool Next);
+	virtual void ChangeCurrentPhoto(const bool Next);
 
 	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
 	void UpdateCurrentPhoto();
 	
 	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
-	void SetEnabled(const bool &Enabled);
+	virtual void SetEnabled(const bool &Enabled);
 	
 	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
 	FORCEINLINE void SetPlayerController(APlayerController *Controller) { PlayerController = Controller; };

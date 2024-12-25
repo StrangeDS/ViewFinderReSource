@@ -8,7 +8,7 @@
 
 AVFPhotoContainer::AVFPhotoContainer()
 {
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
 	Container = CreateDefaultSubobject<USceneComponent>(TEXT("Container"));
@@ -31,20 +31,14 @@ void AVFPhotoContainer::Tick(float DeltaTime)
 
 void AVFPhotoContainer::AddAPhoto(AVFPhoto2D *Photo)
 {
+	check(Photo);
+
 	Photo2Ds.EmplaceLast(Photo);
 	Photo->AttachToComponent(Container, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 
 	UpdateCurrentPhoto();
 }
 
-void AVFPhotoContainer::CreateAPhoto(const FTransform &WorldTrans)
-{
-	// 需要缩放吗?
-	AVFPhoto2D *Photo = GetWorld()->SpawnActor<AVFPhoto2D>(
-		WorldTrans.GetLocation(),
-		WorldTrans.Rotator());
-	AddAPhoto(Photo);
-}
 
 void AVFPhotoContainer::PrepareCurrentPhoto(float Time)
 {
@@ -64,6 +58,9 @@ void AVFPhotoContainer::PrepareCurrentPhoto(float Time)
 
 void AVFPhotoContainer::GiveUpPreparing()
 {
+	if (!CurrentPhoto2D)
+	 	return;
+
 	GetWorldTimerManager().ClearTimer(PrepareTimeHandle);
 	bFocusOn = false;
 	CurrentPhoto2D->Preview(GetActorTransform(), false);
@@ -72,6 +69,9 @@ void AVFPhotoContainer::GiveUpPreparing()
 
 void AVFPhotoContainer::PlaceCurrentPhoto()
 {
+	if (!CurrentPhoto2D)
+	 	return;
+
 	CurrentPhoto2D->Preview(GetActorTransform(), false);
 	CurrentPhoto2D->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 	CurrentPhoto2D->PlaceDown();
