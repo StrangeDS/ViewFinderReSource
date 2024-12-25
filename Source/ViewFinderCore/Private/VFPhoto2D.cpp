@@ -6,15 +6,14 @@
 
 #include "VFPhoto3D.h"
 
-AVFPhoto2D::AVFPhoto2D()
+AVFPhoto2D::AVFPhoto2D() : Super()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
 	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
 	StaticMesh->SetupAttachment(RootComponent);
-	// StaticMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	SetActorEnableCollision(false);
+	StaticMesh->SetCollisionProfileName(TEXT("OverlapOnlyPawn"));
 
     static ConstructorHelpers::FObjectFinder<UStaticMesh> MeshSelector(
 		TEXT("/Game/ViewFinder/StaticMesh/Plane.Plane")

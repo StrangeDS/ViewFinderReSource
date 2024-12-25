@@ -8,7 +8,7 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "VFFunctions.h"
 
-AVFPhoto3D::AVFPhoto3D()
+AVFPhoto3D::AVFPhoto3D() : Super()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
@@ -24,7 +24,7 @@ AVFPhoto3D::AVFPhoto3D()
 void AVFPhoto3D::BeginPlay()
 {
 	check(VFDMCompClass.Get());
-	
+
 	Super::BeginPlay();
 }
 
@@ -103,7 +103,7 @@ void AVFPhoto3D::PlaceDown()
 		Actor->SetActorHiddenInGame(false);
 	}
 	SetVFDMCompsEnabled(true);
-	
+
 	for (const auto Actor : Actors)
 	{
 		if (auto Helper = Actor->GetComponentByClass<UVFHelperComponent>())
@@ -121,11 +121,11 @@ void AVFPhoto3D::SetViewFrustumVisible(const bool &Visiblity)
 void AVFPhoto3D::SetVFDMCompsEnabled(const bool &Enabled)
 {
 	int Count = 0;
-	TArray<AActor*> Actors;
+	TArray<AActor *> Actors;
 	GetAttachedActors(Actors, true, true);
 	for (const auto &Actor : Actors)
 	{
-		TArray<UVFDynamicMeshComponent*> VFDMComps;
+		TArray<UVFDynamicMeshComponent *> VFDMComps;
 		Actor->GetComponents<UVFDynamicMeshComponent>(VFDMComps);
 		for (const auto &Comp : VFDMComps)
 		{
@@ -134,7 +134,6 @@ void AVFPhoto3D::SetVFDMCompsEnabled(const bool &Enabled)
 		Count = Count + VFDMComps.Num();
 	}
 }
-
 
 void AVFPhoto3D::RecordProperty(
 	UVFViewFrustumComponent *ViewFrustum,
