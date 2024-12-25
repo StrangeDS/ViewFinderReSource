@@ -79,6 +79,6 @@ protected:
 public: // Implements IVFStepsRecordInterface:
 	virtual void TickForward_Implementation(float Time) override;
 	virtual void TickBackward_Implementation(float Time) override;
-	TObjectPtr<UVFStepsRecorderWorldSubsystem> StepsRecorder;
+	TObjectPtr<UVFStepsRecorderWorldSubsystem> StepRecorder;
 	TArray<FVFTransStepInfo> Steps;
 };

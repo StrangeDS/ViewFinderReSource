@@ -36,10 +36,10 @@ void AVFTransfromRecorderActor::BeginPlay()
 {
 	Super::BeginPlay();
 
-	StepsRecorder = GetWorld()->GetSubsystem<UVFStepsRecorderWorldSubsystem>();
-	check(StepsRecorder);
+	StepRecorder = GetWorld()->GetSubsystem<UVFStepsRecorderWorldSubsystem>();
+	check(StepRecorder);
 	ReCollectComponents();
-	StepsRecorder->RegisterTransformRecordere(this);
+	StepRecorder->RegisterTransformRecordere(this);
 }
 
 void AVFTransfromRecorderActor::Tick(float DeltaTime)
@@ -83,7 +83,7 @@ void AVFTransfromRecorderActor::ReCollectComponents_Implementation()
 		CompInfoMap.Add(Comp, Info);
 		Infos.Add(Info);
 	}
-	FVFTransStepInfo StepInfo(StepsRecorder->TIME_MIN, Infos);
+	FVFTransStepInfo StepInfo(StepRecorder->TIME_MIN, Infos);
 	Steps.Add(StepInfo);
 }
 
@@ -110,7 +110,7 @@ void AVFTransfromRecorderActor::TickForward_Implementation(float Time)
 
 	if (!Infos.IsEmpty())
 	{
-		FVFTransStepInfo StepInfo(StepsRecorder->GetTime(), Infos);
+		FVFTransStepInfo StepInfo(StepRecorder->GetTime(), Infos);
 		Steps.Add(StepInfo);
 	}
 }
@@ -149,7 +149,7 @@ void AVFTransfromRecorderActor::TickBackward_Implementation(float Time)
 			continue;
 		}
 
-		auto Delta = StepsRecorder->GetDeltaTime() / (StepsRecorder->GetTime() - TimeLast);
+		auto Delta = StepRecorder->GetDeltaTime() / (StepRecorder->GetTime() - TimeLast);
 		Delta = FMath::Min(Delta, 1.0f);
 		Comp->SetWorldTransform(Lerp(Comp->GetComponentTransform(), Info.Transform, Delta));
 		Comp->ComponentVelocity = FMath::Lerp(Comp->GetComponentVelocity(), Info.Velocity, Delta);
