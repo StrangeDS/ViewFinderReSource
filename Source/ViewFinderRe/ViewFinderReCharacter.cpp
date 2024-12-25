@@ -10,6 +10,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 #include "Engine/LocalPlayer.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -20,11 +21,11 @@ AViewFinderReCharacter::AViewFinderReCharacter()
 {
 	// Character doesnt have a rifle at start
 	bHasRifle = false;
-	
+
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(55.f, 96.0f);
-		
-	// Create a CameraComponent	
+
+	// Create a CameraComponent
 	FirstPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
 	FirstPersonCameraComponent->SetupAttachment(GetCapsuleComponent());
 	FirstPersonCameraComponent->SetRelativeLocation(FVector(-10.f, 0.f, 60.f)); // Position the camera
@@ -36,33 +37,35 @@ AViewFinderReCharacter::AViewFinderReCharacter()
 	Mesh1P->SetupAttachment(FirstPersonCameraComponent);
 	Mesh1P->bCastDynamicShadow = false;
 	Mesh1P->CastShadow = false;
-	//Mesh1P->SetRelativeRotation(FRotator(0.9f, -19.19f, 5.2f));
+	// Mesh1P->SetRelativeRotation(FRotator(0.9f, -19.19f, 5.2f));
 	Mesh1P->SetRelativeLocation(FVector(-30.f, 0.f, -150.f));
-
 }
 
 void AViewFinderReCharacter::BeginPlay()
 {
-	// Call the base class  
+	// Call the base class
 	Super::BeginPlay();
 
 	// Add Input Mapping Context
-	if (APlayerController* PlayerController = Cast<APlayerController>(Controller))
+	if (APlayerController *PlayerController = Cast<APlayerController>(Controller))
 	{
-		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
+		if (UEnhancedInputLocalPlayerSubsystem *Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 		{
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
 	}
 
+	StepRecorder = GetWorld()->GetSubsystem<UVFStepsRecorderWorldSubsystem>();
+	check(StepRecorder);
+	StepRecorder->RegisterTickable(this);
 }
 
 //////////////////////////////////////////////////////////////////////////// Input
 
-void AViewFinderReCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+void AViewFinderReCharacter::SetupPlayerInputComponent(UInputComponent *PlayerInputComponent)
 {
 	// Set up action bindings
-	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent))
+	if (UEnhancedInputComponent *EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent))
 	{
 		// Jumping
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
@@ -80,21 +83,20 @@ void AViewFinderReCharacter::SetupPlayerInputComponent(UInputComponent* PlayerIn
 	}
 }
 
-
-void AViewFinderReCharacter::Move(const FInputActionValue& Value)
+void AViewFinderReCharacter::Move(const FInputActionValue &Value)
 {
 	// input is a Vector2D
 	FVector2D MovementVector = Value.Get<FVector2D>();
 
 	if (Controller != nullptr)
 	{
-		// add movement 
+		// add movement
 		AddMovementInput(GetActorForwardVector(), MovementVector.Y);
 		AddMovementInput(GetActorRightVector(), MovementVector.X);
 	}
 }
 
-void AViewFinderReCharacter::Look(const FInputActionValue& Value)
+void AViewFinderReCharacter::Look(const FInputActionValue &Value)
 {
 	// input is a Vector2D
 	FVector2D LookAxisVector = Value.Get<FVector2D>();
@@ -115,4 +117,69 @@ void AViewFinderReCharacter::SetHasRifle(bool bNewHasRifle)
 bool AViewFinderReCharacter::GetHasRifle()
 {
 	return bHasRifle;
+}
+
+FVFPawnTransformInfo::FVFPawnTransformInfo(APawn *Pawn, float TimeIn)
+	: Location(Pawn->GetActorLocation()),
+	  Velocity(Pawn->GetVelocity()),
+	  Rotator(Pawn->GetViewRotation()),
+	  Time(TimeIn)
+{
+	// auto Rotation = GetActorRotation();
+	// auto ControllerRotation = Controller
+	// 	? Controller->GetControlRotation()
+	// 	: Rotation;
+	// Rotator = FRotator(
+	// 	bUseControllerRotationPitch ? ControllerRotation.Pitch : Rotation.Pitch,
+	// 	bUseControllerRotationYaw ? ControllerRotation.Yaw : Rotation.Yaw,
+	// 	bUseControllerRotationRoll ? ControllerRotation.Roll : Rotation.Roll);
+
+	// 	bUseControllerRotationPitch
+}
+
+bool FVFPawnTransformInfo::operator==(const FVFPawnTransformInfo &Other) const
+{
+	if (Location != Other.Location)
+		return false;
+	if (Velocity != Other.Velocity)
+		return false;
+	return Rotator == Other.Rotator;
+}
+
+void AViewFinderReCharacter::TickForward_Implementation(float Time)
+{
+	FVFPawnTransformInfo Info(this, StepRecorder->Time);
+	if (Steps.IsEmpty() || Steps.Last() != Info)
+	{
+		Steps.Add(Info);
+	}
+}
+
+void AViewFinderReCharacter::TickBackward_Implementation(float Time)
+{
+	while (Steps.Num() > 1)
+	{
+		auto &StepInfo = Steps.Last();
+		if (StepInfo.Time < Time)
+			break;
+
+		Steps.Pop(false);
+	}
+	
+	auto &Step = Steps.Last();
+	auto Delta = StepRecorder->GetDeltaTime() / (StepRecorder->GetTime() - Step.Time);
+	Delta = FMath::Min(Delta, 1.0f);
+	SetActorLocation(FMath::Lerp(GetActorLocation(), Step.Location, Delta));
+
+	auto Velocity = FMath::Lerp(GetVelocity(), Step.Velocity, Delta);
+	if(GetRootComponent() && GetRootComponent()->IsSimulatingPhysics())
+	{
+		GetRootComponent()->ComponentVelocity = Velocity;
+	}
+	else
+	{
+		GetCharacterMovement()->Velocity = Velocity;
+	}
+
+	GetController()->SetControlRotation(FMath::Lerp(GetViewRotation(), Step.Rotator, Delta));
 }

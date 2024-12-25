@@ -5,6 +5,10 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
+
+#include "VFStepsRecordInterface.h"
+#include "VFStepsRecorderWorldSubsystem.h"
+
 #include "ViewFinderReCharacter.generated.h"
 
 class UInputComponent;
@@ -16,8 +20,32 @@ struct FInputActionValue;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 
+USTRUCT(BlueprintType)
+struct FVFPawnTransformInfo
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "ViewFinder")
+	FVector Location;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "ViewFinder")
+	FVector Velocity;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "ViewFinder")
+	FRotator Rotator;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "ViewFinder")
+	float Time = 0.f;
+
+	FVFPawnTransformInfo() {};
+
+	FVFPawnTransformInfo(APawn *Pawn, float TimeIn);
+
+	bool operator==(const FVFPawnTransformInfo &Other) const;
+};
+
 UCLASS(config=Game)
-class AViewFinderReCharacter : public ACharacter
+class AViewFinderReCharacter : public ACharacter, public IVFStepsRecordInterface
 {
 	GENERATED_BODY()
 
@@ -83,5 +111,14 @@ public:
 	/** Returns FirstPersonCameraComponent subobject **/
 	UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
 
+public:
+	virtual void TickForward_Implementation(float Time) override;
+
+	virtual void TickBackward_Implementation(float Time) override;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ViewFinder")
+	TArray<FVFPawnTransformInfo> Steps;
+	
+	TObjectPtr<UVFStepsRecorderWorldSubsystem> StepRecorder;
 };
 
