@@ -47,9 +47,17 @@ void UVFStepsRecorderWorldSubsystem::TickForward(float DeltaTime)
 {
     Time = FMath::Min(Time, TIME_MAX);
 
-    for (const auto &Target : TickTargets)
+    for (auto It = TickTargets.CreateIterator(); It; ++It)
     {
-        IVFStepsRecordInterface::Execute_TickForward(Target.GetObject(), Time);
+        auto Target = *It;
+        if (!Target)
+        {
+            It.RemoveCurrent();
+        }
+        else
+        {
+            IVFStepsRecordInterface::Execute_TickForward(Target.GetObject(), Time);
+        }
     }
 }
 
@@ -67,6 +75,9 @@ void UVFStepsRecorderWorldSubsystem::TickBackward(float DeltaTime)
         auto Info = Infos.Last();
         if (Info.Time < Time)
             break;
+
+        if (!Info.Sender)
+            continue;
 
         bool handled = IVFStepsRecordInterface::Execute_StepBack(Info.Sender, Info);
         if (!handled)
