@@ -31,7 +31,7 @@ void AVFPhoto2D::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	// Helper->OnCopyAfterCopiedForPhoto.AddUniqueDynamic(this, &AVFPhoto2D::CopyPhoto3D);
+	Helper->OnCopyAfterCopiedForPhoto.AddUniqueDynamic(this, &AVFPhoto2D::CopyPhoto3D);
 
 	RenderTarget = NewObject<UTextureRenderTarget2D>(this);
 	RenderTarget->ResizeTarget(PixelNum, PixelNum);
@@ -96,7 +96,7 @@ void AVFPhoto2D::Preview(const FTransform& WorldTrans, const bool &Enabled)
 	
 	if (Enabled)
 	{
-	Photo3D->SetActorTransform(WorldTrans);
+		Photo3D->SetActorTransform(WorldTrans);
 	}
 	Photo3D->SetViewFrustumVisible(Enabled);
 }
@@ -113,4 +113,25 @@ void AVFPhoto2D::PlaceDown()
 	Photo3D->PlaceDown();
 	SetActorHiddenInGame(true);
 	SetActorEnableCollision(false);
+}
+
+// 递归拷贝Actor
+static AActor* CopyActor(AActor *Actor)
+{
+	auto Res = UVFFunctions::CloneActorRuntime(Actor);
+	TArray<AActor *> ChildActors;
+	Actor->GetAttachedActors(ChildActors);
+	for (auto &ChildActor : ChildActors)
+	{
+		CopyActor(ChildActor)->AttachToActor(Res, FAttachmentTransformRules::KeepWorldTransform);
+	}
+	return Res;
+}
+
+void AVFPhoto2D::CopyPhoto3D()
+{
+	if (!Photo3D)
+		return;
+
+	Photo3D = Cast<AVFPhoto3D>(CopyActor(Photo3D));
 }

@@ -25,7 +25,7 @@ protected:
 
 public:
 	virtual void Tick(float DeltaTime) override;
-
+	
 	virtual void SetActorHiddenInGame(bool bNewHidden) override;
 
 public:
@@ -46,6 +46,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, CallInEditor, Category = "ViewFinder")
 	virtual void PlaceDown();
+
+	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
+	void CopyPhoto3D();
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ViewFinder")
@@ -71,7 +74,7 @@ protected: // 材质相关
 	TObjectPtr<UMaterialInstanceDynamic> MaterialInstance;
 
 protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ViewFinder")
+	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "ViewFinder")
 	TObjectPtr<AVFPhoto3D> Photo3D;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ViewFinder")
