@@ -67,6 +67,5 @@ void AVFPawnStandIn::TeleportTargetPawn()
 
 void AVFPawnStandIn::Hide()
 {
-	UE_LOG(LogTemp, Warning, TEXT(" AVFPawnStandIn::Hide"));
 	SetActorHiddenInGame(true);
 }

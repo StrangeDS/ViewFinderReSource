@@ -26,8 +26,6 @@ void AVFPhoto3D::BeginPlay()
 	check(VFDMCompClass.Get());
 
 	Super::BeginPlay();
-
-    FoldUp();
 }
 
 void AVFPhoto3D::Tick(float DeltaTime)
