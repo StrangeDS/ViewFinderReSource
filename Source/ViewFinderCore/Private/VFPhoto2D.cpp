@@ -31,7 +31,7 @@ void AVFPhoto2D::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	Helper->OnCopyAfterCopiedForPhoto.AddUniqueDynamic(this, &AVFPhoto2D::CopyPhoto3D);
+	// Helper->OnCopyAfterCopiedForPhoto.AddUniqueDynamic(this, &AVFPhoto2D::CopyPhoto3D);
 
 	RenderTarget = NewObject<UTextureRenderTarget2D>(this);
 	RenderTarget->ResizeTarget(PixelNum, PixelNum);
