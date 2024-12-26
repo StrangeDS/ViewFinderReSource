@@ -50,6 +50,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ViewFinder|ClassSetting")
 	TSubclassOf<class AVFPhoto3D> VFPhoto3DClass;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ViewFinder|ClassSetting")
+	TSubclassOf<class AVFPawnStandIn> VFPawnStandInClass;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ViewFinder")
 	bool bOnlyOverlapWithHelps = false;
 	
@@ -65,6 +68,9 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ViewFinder")
 	TObjectPtr<class UStaticMeshComponent> StaticMesh;
+
+	UPROPERTY()
+	TObjectPtr<UStaticMesh> CatcherMesh;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ViewFinder")
 	TObjectPtr<class UVFPhotoCaptureComponent> PhotoCapture;

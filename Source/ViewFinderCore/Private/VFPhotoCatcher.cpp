@@ -29,10 +29,14 @@ AVFPhotoCatcher::AVFPhotoCatcher()
 	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
 	StaticMesh->SetupAttachment(RootComponent);
 	StaticMesh->SetCollisionProfileName(TEXT("OverlapOnlyPawn"));
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> MeshSelector(
+		TEXT("/Game/ViewFinder/StaticMesh/Camera_Temp.Camera_Temp"));
+	CatcherMesh = MeshSelector.Object;
+	StaticMesh->SetStaticMesh(CatcherMesh);
 
 	PhotoCapture = CreateDefaultSubobject<UVFPhotoCaptureComponent>(TEXT("PhotoCapture"));
 	PhotoCapture->SetupAttachment(RootComponent);
-	
+
 	ViewFrustum = CreateDefaultSubobject<UVFViewFrustumComponent>(TEXT("ViewFrustum"));
 	ViewFrustum->SetupAttachment(RootComponent);
 }
@@ -52,6 +56,7 @@ void AVFPhotoCatcher::BeginPlay()
 	check(VFDMCompClass.Get());
 	check(VFPhoto2DClass.Get());
 	check(VFPhoto3DClass.Get());
+	check(VFPawnStandInClass.Get());
 
 	Super::BeginPlay();
 
@@ -76,6 +81,9 @@ AVFPhoto2D *AVFPhotoCatcher::TakeAPhoto_Implementation()
 		UPrimitiveComponent::StaticClass(),
 		ActorsToIgnore,
 		OverlapComps);
+	
+	// 对Pawn的特殊处理
+	UVFFunctions::CheckPawnComps(OverlapComps, VFPawnStandInClass, true);
 
 	// Helper筛选
 	TMap<UPrimitiveComponent *, UVFHelperComponent *> HelperMap;
@@ -118,7 +126,7 @@ AVFPhoto2D *AVFPhotoCatcher::TakeAPhoto_Implementation()
 	// }
 
 	UE_LOG(LogTemp, Warning, TEXT("TakeAPhoto_Implementation overlaps %i"), VFDMComps.Num());
-	
+
 	for (auto &Helper : HelpersRecorder)
 	{
 		Helper->NotifyDelegate(FVFHelperDelegateType::OriginalBeforeCopyingToPhoto);
@@ -177,6 +185,11 @@ AVFPhoto2D *AVFPhotoCatcher::TakeAPhoto_Implementation()
 	Photo2D->SetPhoto(PhotoCapture);
 	Photo3D->RecordProperty(ViewFrustum, bOnlyOverlapWithHelps, ObjectTypesToOverlap);
 	Photo2D->FoldUp();
+
+	for (auto &Helper : HelpersRecorder)
+	{
+		Helper->NotifyDelegate(FVFHelperDelegateType::OriginalAfterTakingPhoto);
+	}
 
 	return Photo2D;
 }
