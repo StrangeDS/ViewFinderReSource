@@ -10,6 +10,7 @@ enum class FVFHelperDelegateType : uint8
 	OriginalBeforeTakenInPhoto,
 	OriginalBeforeCopyingToPhoto,
 	OriginalAfterCutByPhoto,
+	OriginalAfterTakingPhoto,
 	CopyAfterCopiedForPhoto,
 	CopyBeforeFoldedInPhoto,
 	CopyAfterPlacedByPhoto
@@ -25,10 +26,11 @@ class VIEWFINDERCORE_API UVFHelperComponent : public UActorComponent
 public:
 	UVFHelperComponent(const FObjectInitializer &ObjectInitializer = FObjectInitializer::Get());
 
-protected:
-	virtual void BeginPlay() override;
-
 public:
+	virtual void BeginPlay() override;
+	
+	virtual void BeginDestroy() override;
+
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction *ThisTickFunction) override;
 
 public: // 注意: PROPERTY在CloneActorRuntime中不会被复制. 注意默认值.
@@ -55,6 +57,10 @@ public:
 	// 被相片覆盖裁剪之后. 相机bCuttingOriginal为true才会触发
 	UPROPERTY(BlueprintAssignable, Category = "ViewFinder")
 	FVFHelperDelegate OnOriginalAfterCutByPhoto;
+
+	// (Photo2D)拍照完成后
+	UPROPERTY(BlueprintAssignable, Category = "ViewFinder")
+	FVFHelperDelegate OnOriginalAfterTakingPhoto;
 
 	// 复制出的Actor(Copy)
 	// 复制后

@@ -11,6 +11,18 @@ void UVFHelperComponent::BeginPlay()
 	Super::BeginPlay();
 }
 
+void UVFHelperComponent::BeginDestroy()
+{
+	OnOriginalBeforeTakenInPhoto.Clear();
+	OnOriginalBeforeCopyingToPhoto.Clear();
+	OnOriginalAfterCutByPhoto.Clear();
+	OnOriginalAfterTakingPhoto.Clear();
+	OnCopyAfterCopiedForPhoto.Clear();
+	OnCopyBeforeFoldedInPhoto.Clear();
+	OnCopyAfterPlacedByPhoto.Clear();
+
+	Super::BeginDestroy();
+}
 
 void UVFHelperComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
@@ -32,6 +44,10 @@ bool UVFHelperComponent::NotifyDelegate(const FVFHelperDelegateType &Type)
 		break;
 	case FVFHelperDelegateType::OriginalAfterCutByPhoto:
 		OnOriginalAfterCutByPhoto.Broadcast();
+		IsHandled = true;
+		break;
+	case FVFHelperDelegateType::OriginalAfterTakingPhoto:
+		OnOriginalAfterTakingPhoto.Broadcast();
 		IsHandled = true;
 		break;
 	case FVFHelperDelegateType::CopyAfterCopiedForPhoto:
