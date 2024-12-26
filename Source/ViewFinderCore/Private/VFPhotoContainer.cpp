@@ -66,6 +66,7 @@ void AVFPhotoContainer::GiveUpPreparing()
 	 	return;
 
 	GetWorldTimerManager().ClearTimer(PrepareTimeHandle);
+	CurrentPhoto2D->Preview(GetActorTransform(), false);
 	bFocusOn = false;
 	PlayerController->GetPawn()->EnableInput(PlayerController);
 }

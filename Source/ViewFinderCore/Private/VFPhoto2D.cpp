@@ -94,7 +94,10 @@ void AVFPhoto2D::Preview(const FTransform& WorldTrans, const bool &Enabled)
 	if (!Photo3D)
 		return;
 	
+	if (Enabled)
+	{
 	Photo3D->SetActorTransform(WorldTrans);
+	}
 	Photo3D->SetViewFrustumVisible(Enabled);
 }
 
