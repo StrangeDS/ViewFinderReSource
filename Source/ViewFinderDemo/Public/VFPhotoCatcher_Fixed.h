@@ -10,6 +10,19 @@ class VIEWFINDERDEMO_API AVFPhotoCatcher_Fixed : public AVFPhotoCatcher_Interact
 	GENERATED_BODY()
 	
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ViewFinder")
+	FVector PhotoSpawnPoint = FVector(0.f, 50.0f, 0.f);
+
+	virtual AVFPhoto2D *TakeAPhoto_Implementation() override;
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ViewFinder")
+	float TimeOfTakingPhoto = 0.f;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ViewFinder")
+	FTimerHandle TimerHandleOfTakingPhoto;
+
+public:
 	virtual bool StartAiming_Implementation(APlayerController *Controller) override;
 
 	virtual bool EndAiming_Implementation(APlayerController *Controller) override;

@@ -1,5 +1,22 @@
 #include "VFPhotoCatcher_Fixed.h"
 
+#include "VFPhoto2D.h"
+
+AVFPhoto2D *AVFPhotoCatcher_Fixed::TakeAPhoto_Implementation()
+{
+    GetWorldTimerManager().ClearTimer(TimerHandleOfTakingPhoto);
+    GetWorldTimerManager().SetTimer(
+        TimerHandleOfTakingPhoto, [this]()
+        {
+            auto Photo = Super::TakeAPhoto_Implementation();
+            Photo->AddActorLocalOffset(PhotoSpawnPoint);
+        },
+        TimeOfTakingPhoto,
+        false);
+
+    return nullptr;
+}
+
 bool AVFPhotoCatcher_Fixed::StartAiming_Implementation(APlayerController *Controller)
 {
     Super::StartAiming_Implementation(Controller);
