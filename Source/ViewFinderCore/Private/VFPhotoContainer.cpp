@@ -5,6 +5,7 @@
 #include "InputMappingContext.h"
 
 #include "VFPhoto2D.h"
+#include "VFHelperComponent.h"
 
 AVFPhotoContainer::AVFPhotoContainer()
 {
@@ -17,6 +18,10 @@ AVFPhotoContainer::AVFPhotoContainer()
 	static ConstructorHelpers::FObjectFinder<UInputMappingContext> Selector(
 		TEXT("/Game/ViewFinder/Input/PhotoContainer/IMC_PhotoContainer.IMC_PhotoContainer"));
 	MappingContext = Selector.Object;
+
+	Helper = CreateDefaultSubobject<UVFHelperComponent>(TEXT("Helper"));
+	Helper->bCanBeTakenInPhoto = false;
+	Helper->bCanBePlacedByPhoto = false;
 }
 
 void AVFPhotoContainer::BeginPlay()
@@ -39,7 +44,6 @@ void AVFPhotoContainer::AddAPhoto(AVFPhoto2D *Photo)
 	UpdateCurrentPhoto();
 }
 
-
 void AVFPhotoContainer::PrepareCurrentPhoto(float Time)
 {
 	if (!CurrentPhoto2D)
@@ -50,8 +54,8 @@ void AVFPhotoContainer::PrepareCurrentPhoto(float Time)
 	GetWorldTimerManager().SetTimer(
 		PrepareTimeHandle, [this]()
 		{
-            bFocusOn = true;
-            CurrentPhoto2D->Preview(GetActorTransform(), true); },
+            CurrentPhoto2D->Preview(GetActorTransform(), true);
+            bFocusOn = true; },
 		Time,
 		false);
 }
@@ -63,7 +67,6 @@ void AVFPhotoContainer::GiveUpPreparing()
 
 	GetWorldTimerManager().ClearTimer(PrepareTimeHandle);
 	bFocusOn = false;
-	CurrentPhoto2D->Preview(GetActorTransform(), false);
 	PlayerController->GetPawn()->EnableInput(PlayerController);
 }
 
