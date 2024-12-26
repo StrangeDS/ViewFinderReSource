@@ -2,13 +2,13 @@
 
 void AVFPhoto3DSteppable::BeginPlay()
 {
-	Super::BeginPlay();
-
 	StepRecorder = GetWorld()->GetSubsystem<UVFStepsRecorderWorldSubsystem>();
     check(StepRecorder);
     StepRecorder->SubmitStep(
         this,
         FVFStepInfo{ToString(EVFPhoto3DState::None)});
+
+	Super::BeginPlay();
 }
 
 void AVFPhoto3DSteppable::FoldUp()

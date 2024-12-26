@@ -17,5 +17,6 @@ AVFPhoto2D *AVFPhotoCatcherSteppable::TakeAPhoto_Implementation()
 
 bool AVFPhotoCatcherSteppable::StepBack_Implementation(FVFStepInfo &StepInfo)
 {
-    return false;
+    // Nothing To Do.
+    return true;
 }

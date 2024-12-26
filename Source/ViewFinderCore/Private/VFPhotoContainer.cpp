@@ -76,7 +76,6 @@ void AVFPhotoContainer::PlaceCurrentPhoto()
 	if (!CurrentPhoto2D)
 	 	return;
 
-	CurrentPhoto2D->Preview(GetActorTransform(), false);
 	CurrentPhoto2D->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 	CurrentPhoto2D->PlaceDown();
 	Photo2Ds.PopLast();

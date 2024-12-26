@@ -3,6 +3,7 @@
 #include "VFDynamicMeshComponent.h"
 #include "VFDynamicMeshPoolWorldSubsystem.h"
 
+// 非递归拷贝Actor, 需要递归可参考AVFPhoto2D::CopyPhoto3D()
 AActor *UVFFunctions::CloneActorRuntime(AActor *Original)
 {
 	if (!Original || !Original->GetWorld())
