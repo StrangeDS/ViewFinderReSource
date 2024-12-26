@@ -12,6 +12,8 @@
 #include "Engine/LocalPlayer.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
+#include "VFHelperComponent.h"
+
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
 //////////////////////////////////////////////////////////////////////////
@@ -39,6 +41,9 @@ AViewFinderReCharacter::AViewFinderReCharacter()
 	Mesh1P->CastShadow = false;
 	// Mesh1P->SetRelativeRotation(FRotator(0.9f, -19.19f, 5.2f));
 	Mesh1P->SetRelativeLocation(FVector(-30.f, 0.f, -150.f));
+
+	Helper = CreateDefaultSubobject<UVFHelperComponent>("Helper");
+	Helper->bCanBePlacedByPhoto = false;
 }
 
 void AViewFinderReCharacter::BeginPlay()
@@ -125,16 +130,6 @@ FVFPawnTransformInfo::FVFPawnTransformInfo(APawn *Pawn, float TimeIn)
 	  Rotator(Pawn->GetViewRotation()),
 	  Time(TimeIn)
 {
-	// auto Rotation = GetActorRotation();
-	// auto ControllerRotation = Controller
-	// 	? Controller->GetControlRotation()
-	// 	: Rotation;
-	// Rotator = FRotator(
-	// 	bUseControllerRotationPitch ? ControllerRotation.Pitch : Rotation.Pitch,
-	// 	bUseControllerRotationYaw ? ControllerRotation.Yaw : Rotation.Yaw,
-	// 	bUseControllerRotationRoll ? ControllerRotation.Roll : Rotation.Roll);
-
-	// 	bUseControllerRotationPitch
 }
 
 bool FVFPawnTransformInfo::operator==(const FVFPawnTransformInfo &Other) const
@@ -165,14 +160,14 @@ void AViewFinderReCharacter::TickBackward_Implementation(float Time)
 
 		Steps.Pop(false);
 	}
-	
+
 	auto &Step = Steps.Last();
 	auto Delta = StepRecorder->GetDeltaTime() / (StepRecorder->GetTime() - Step.Time);
 	Delta = FMath::Min(Delta, 1.0f);
 	SetActorLocation(FMath::Lerp(GetActorLocation(), Step.Location, Delta));
 
 	auto Velocity = FMath::Lerp(GetVelocity(), Step.Velocity, Delta);
-	if(GetRootComponent() && GetRootComponent()->IsSimulatingPhysics())
+	if (GetRootComponent() && GetRootComponent()->IsSimulatingPhysics())
 	{
 		GetRootComponent()->ComponentVelocity = Velocity;
 	}

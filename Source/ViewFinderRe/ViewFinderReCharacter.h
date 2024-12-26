@@ -112,6 +112,10 @@ public:
 	UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
 
 public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ViewFinder")
+	TObjectPtr<class UVFHelperComponent> Helper;
+
+public:
 	virtual void TickForward_Implementation(float Time) override;
 
 	virtual void TickBackward_Implementation(float Time) override;
