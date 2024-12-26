@@ -21,6 +21,36 @@ AActor *UVFFunctions::CloneActorRuntime(AActor *Original)
 	return Copy;
 }
 
+bool UVFFunctions::CheckPawnComps(TArray<UPrimitiveComponent *> &Components, TSubclassOf<AVFPawnStandIn> PawnStandInClass, bool NeedStandIn)
+{
+	TArray<APawn *> Pawns;
+
+	for (auto It = Components.CreateIterator(); It; ++It)
+	{
+		auto Comp = *It;
+		if (auto Pawn = Cast<APawn>(Comp->GetOwner()))
+		{
+			Pawns.AddUnique(Pawn);
+			It.RemoveCurrent();
+		}
+	}
+
+	if (!NeedStandIn)
+		return Pawns.Num() > 0;
+
+	for (const auto &Pawn : Pawns)
+	{
+		auto StandIn = Pawn->GetWorld()->SpawnActor<AVFPawnStandIn>(
+			PawnStandInClass,
+			Pawn->GetActorLocation(),
+			Pawn->GetControlRotation());
+		StandIn->SetTargetPawn(Pawn);
+		Components.Add(StandIn->GetVFDMComp());
+	}
+
+	return Pawns.Num() > 0;
+}
+
 // 对于已有VFDMComp的, 其实很简单, 它们其余的静态网格体在上次就已经被筛掉,
 // 并不会参与后续的处理, 它们仅有的VFDMComp就是用于视锥处理的部分.
 // 对于没有VFDMComp的, 它们第一次参与处理, 仅需处理与视锥overlap的基元组件.
@@ -93,7 +123,7 @@ UVFDynamicMeshComponent *UVFFunctions::GetCloneVFDMComp(UVFDynamicMeshComponent 
 	return nullptr;
 }
 
-TArray<AActor *> UVFFunctions::CopyActorFromVFDMComps(UWorld* World, const TArray<UVFDynamicMeshComponent *> &Components, TArray<UVFDynamicMeshComponent *> &CopiedComps)
+TArray<AActor *> UVFFunctions::CopyActorFromVFDMComps(UWorld *World, const TArray<UVFDynamicMeshComponent *> &Components, TArray<UVFDynamicMeshComponent *> &CopiedComps)
 {
 	TRACE_CPUPROFILER_EVENT_SCOPE(TEXT("UVFFunctions::CopyActorFromVFDMComps()"));
 	CopiedComps.Reset();

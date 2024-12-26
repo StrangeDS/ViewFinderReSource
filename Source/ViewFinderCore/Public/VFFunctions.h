@@ -4,6 +4,7 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 
 #include "VFHelperComponent.h"
+#include "VFPawnStandIn.h"
 
 #include "VFFunctions.generated.h"
 
@@ -15,6 +16,12 @@ class VIEWFINDERCORE_API UVFFunctions : public UBlueprintFunctionLibrary
 public:
 	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
 	static AActor *CloneActorRuntime(AActor *Original);
+
+	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
+	static bool CheckPawnComps(
+		TArray<UPrimitiveComponent *> &Components,
+		TSubclassOf<AVFPawnStandIn> PawnStandInClass,
+		bool NeedStandIn = false);
 
 	/// @brief 检验未处理过的的Actor, 处理为: 将其相关基元替换为VFDMComp, 关闭隐藏其它基元组件.
 	/// @param OverlapsComps
