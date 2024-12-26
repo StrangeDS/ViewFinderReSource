@@ -5,6 +5,8 @@
 #include "Components/SceneCaptureComponent2D.h"
 
 #include "VFPhoto3D.h"
+#include "VFHelperComponent.h"
+#include "VFFunctions.h"
 
 AVFPhoto2D::AVFPhoto2D() : Super()
 {
@@ -13,19 +15,23 @@ AVFPhoto2D::AVFPhoto2D() : Super()
 	RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
 	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
 	StaticMesh->SetupAttachment(RootComponent);
-	StaticMesh->SetCollisionProfileName(TEXT("OverlapOnlyPawn"));
-
+	StaticMesh->SetCollisionProfileName(TEXT("IgnoreOnlyPawn"));
     static ConstructorHelpers::FObjectFinder<UStaticMesh> MeshSelector(
 		TEXT("/Game/ViewFinder/StaticMesh/Plane.Plane")
 		);
 	StaticMeshObject = MeshSelector.Object;
 	StaticMesh->SetStaticMesh(StaticMeshObject);
 	StaticMesh->SetRelativeRotation(FRotator(0.f, 90.0f, 0.f));
+
+	Helper = CreateDefaultSubobject<UVFHelperComponent>("Helper");
+	Helper->bCanBePlacedByPhoto = false;
 }
 
 void AVFPhoto2D::BeginPlay()
 {
 	Super::BeginPlay();
+	
+	Helper->OnCopyAfterCopiedForPhoto.AddUniqueDynamic(this, &AVFPhoto2D::CopyPhoto3D);
 
 	RenderTarget = NewObject<UTextureRenderTarget2D>(this);
 	RenderTarget->ResizeTarget(PixelNum, PixelNum);
@@ -35,6 +41,13 @@ void AVFPhoto2D::BeginPlay()
 void AVFPhoto2D::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+}
+
+void AVFPhoto2D::SetActorHiddenInGame(bool bNewHidden)
+{
+	Super::SetActorHiddenInGame(bNewHidden);
+
+	SetActorEnableCollision(!bNewHidden);
 }
 
 void AVFPhoto2D::SetPhoto3D(AVFPhoto3D *Photo)

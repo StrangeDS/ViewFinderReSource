@@ -26,6 +26,8 @@ protected:
 public:
 	virtual void Tick(float DeltaTime) override;
 
+	virtual void SetActorHiddenInGame(bool bNewHidden) override;
+
 public:
 	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
 	void SetPhoto3D(class AVFPhoto3D *Photo);
@@ -71,4 +73,7 @@ protected: // 材质相关
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ViewFinder")
 	TObjectPtr<AVFPhoto3D> Photo3D;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ViewFinder")
+	TObjectPtr<class UVFHelperComponent> Helper;
 };
