@@ -185,7 +185,7 @@ UDynamicMesh *UVFGeometryFunctions::CopyMeshFromStaticMesh(
 		RequestedLOD.LODType == EVF_GeometryScriptLODType::MaxAvailable ||
 		RequestedLOD.LODType == EVF_GeometryScriptLODType::RenderData);
 
-	if (ensure(!FromStaticMeshAsset->bAllowCPUAccess))
+	if (!ensure(FromStaticMeshAsset->bAllowCPUAccess))
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Mesh %s bAllowCPUAccess needs to be true."), *FromStaticMeshAsset->GetName());
 #if !WITH_EDITOR
