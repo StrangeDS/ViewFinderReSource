@@ -60,13 +60,20 @@ protected:
 	UPROPERTY()
 	TObjectPtr<class UStaticMesh> StaticMeshObject;
 
-protected: // 材质相关
+public: // 材质相关
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ViewFinder")
 	int PixelNum = 1024;
+	
+	UPROPERTY(VisibleAnywhere, Category = "ViewFinder")
+	float AspectRatio = 16.0f / 9;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ViewFinder")
 	FName TextureName = TEXT("Texture");
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ViewFinder")
+	FName RatioName = TEXT("AspectRatio");
 
+protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ViewFinder")
 	TObjectPtr<UTextureRenderTarget2D> RenderTarget;
 

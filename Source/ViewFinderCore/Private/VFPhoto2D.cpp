@@ -35,8 +35,8 @@ void AVFPhoto2D::BeginPlay()
 	Helper->OnCopyAfterCopiedForPhoto.AddUniqueDynamic(this, &AVFPhoto2D::CopyPhoto3D);
 
 	RenderTarget = NewObject<UTextureRenderTarget2D>(this);
-	RenderTarget->ResizeTarget(PixelNum, PixelNum);
-	RenderTarget->RenderTargetFormat = ETextureRenderTargetFormat::RTF_RGBA8;
+	RenderTarget->InitCustomFormat(PixelNum, PixelNum, PF_FloatRGBA, false);
+	RenderTarget->ClearColor = FLinearColor::Black;
 }
 
 void AVFPhoto2D::Tick(float DeltaTime)
@@ -69,6 +69,7 @@ void AVFPhoto2D::SetPhoto(USceneCaptureComponent2D *Capturer)
 	if (!MaterialInstance)
 	{
 		MaterialInstance = StaticMesh->CreateAndSetMaterialInstanceDynamic(0);
+		MaterialInstance->SetScalarParameterValue(RatioName, AspectRatio);
 		MaterialInstance->SetTextureParameterValue(TextureName, RenderTarget);
 	}
 

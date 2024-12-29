@@ -47,8 +47,9 @@ void AVFPhotoCatcher::OnConstruction(const FTransform &Transform)
 
 	ActorsToIgnore.AddUnique(this);
 	ViewFrustum->RegenerateViewFrustum(ViewAngle, AspectRatio, StartDis, EndDis);
-	// TODO: Sync PhotoCapture.
-	PhotoCapture->Init(StaticMesh);
+	PhotoCapture->FOVAngle = ViewAngle;
+	PhotoCapture->Init(StaticMesh, AspectRatio);
+	PhotoCapture->CustomNearClippingPlane = StartDis;
 }
 
 void AVFPhotoCatcher::BeginPlay()
@@ -184,6 +185,8 @@ AVFPhoto2D *AVFPhotoCatcher::TakeAPhoto_Implementation()
 	Photo2D->SetPhoto3D(Photo3D);
 	Photo3D->RecordProperty(ViewFrustum, bOnlyOverlapWithHelps, ObjectTypesToOverlap);
 	Photo2D->FoldUp();
+
+	Photo2D->AspectRatio = AspectRatio;
 	Photo2D->SetPhoto(PhotoCapture);
 
 	for (auto &Helper : HelpersRecorder)

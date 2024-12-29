@@ -16,20 +16,27 @@ void UVFPhotoCaptureComponent::BeginPlay()
 
 	RenderTarget = NewObject<UTextureRenderTarget2D>(this);
 	this->TextureTarget = RenderTarget;
-	RenderTarget->ResizeTarget(Width, Height);
-	RenderTarget->RenderTargetFormat = ETextureRenderTargetFormat::RTF_RGBA8;
+	RenderTarget->InitCustomFormat(Width, Width, PF_FloatRGBA, false);
+	RenderTarget->ClearColor = FLinearColor::Black;
 
 	auto Actor = GetOwner();
-	while (Actor) {
+	while (Actor)
+	{
 		HiddenActors.AddUnique(Actor);
 		Actor = Actor->GetParentActor();
 	}
 }
 
-void UVFPhotoCaptureComponent::Init(UStaticMeshComponent* Mesh, int Index, FName Name)
+void UVFPhotoCaptureComponent::Init(UStaticMeshComponent *Mesh,
+									float AspectRatioIn,
+									int Index,
+									FName TextureNameIn,
+									FName RatioNameIn)
 {
 	MaterialInstance = Mesh->CreateAndSetMaterialInstanceDynamic(Index);
-	TextureName = Name;
+	AspectRatio = AspectRatioIn;
+	TextureName = TextureNameIn;
+	RatioName = RatioNameIn;
 }
 
 void UVFPhotoCaptureComponent::StartDraw()
@@ -38,6 +45,7 @@ void UVFPhotoCaptureComponent::StartDraw()
 		return;
 
 	MaterialInstance->SetTextureParameterValue(TextureName, RenderTarget);
+	MaterialInstance->SetScalarParameterValue(RatioName, AspectRatio);
 	bCaptureEveryFrame = true;
 }
 

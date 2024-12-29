@@ -18,7 +18,11 @@ public:
 	virtual void BeginPlay() override;
 
 	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
-	void Init(class UStaticMeshComponent* Mesh, int Index = 0, FName Name = TEXT("Texture"));
+	void Init(class UStaticMeshComponent *Mesh,
+			  float AspectRatioIn = 1.777778f,
+			  int Index = 0,
+			  FName TextureNameIn = TEXT("Texture"),
+			  FName RatioNameIn = TEXT("AspectRatio"));
 
 	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
 	void StartDraw();
@@ -26,22 +30,26 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
 	void EndDraw();
 
-protected:
+public:
 	UPROPERTY(EditAnywhere, Category = "ViewFinder")
 	int Width = 1024;
 
-	UPROPERTY(EditAnywhere, Category = "ViewFinder")
-	int Height = 1024;
+	UPROPERTY(VisibleAnywhere, Category = "ViewFinder")
+	float AspectRatio = 16.0f / 9;
 
 	UPROPERTY(VisibleAnywhere, Category = "ViewFinder")
-	FName TextureName;
+	FName TextureName = TEXT("Texture");
 
+	UPROPERTY(VisibleAnywhere, Category = "ViewFinder")
+	FName RatioName = TEXT("AspectRatio");
+
+protected:
 	UPROPERTY(VisibleAnywhere, Category = "ViewFinder")
 	TObjectPtr<UTextureRenderTarget2D> RenderTarget;
-	
+
 	UPROPERTY(VisibleAnywhere, Category = "ViewFinder")
 	TObjectPtr<UMaterialInstanceDynamic> MaterialInstance;
-	
+
 	UPROPERTY(VisibleAnywhere, Category = "ViewFinder")
 	TObjectPtr<UTexture> OriginalTexture;
 };
