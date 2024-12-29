@@ -1,5 +1,6 @@
 #include "VFDynamicMeshComponent.h"
 
+#include "VFDynamicMeshPoolWorldSubsystem.h"
 #include "VFGeometryFunctions.h"
 
 UVFDynamicMeshComponent::UVFDynamicMeshComponent(const FObjectInitializer &ObjectInitializer)
@@ -8,31 +9,18 @@ UVFDynamicMeshComponent::UVFDynamicMeshComponent(const FObjectInitializer &Objec
     SetMobility(EComponentMobility::Movable);
 }
 
-void UVFDynamicMeshComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
+void UVFDynamicMeshComponent::BeginPlay()
 {
-    // auto PoolSystem = GetWorld()->GetSubsystem<UVFDynamicMeshPoolWorldSubsystem>();
-    // check(PoolSystem);
-    // switch (MeshType)
-    // {
-    // case ViewFinder::Placing:
-    //     if (MeshObject) PoolSystem->ReturnPlacingMesh(MeshObject);
-    //     break;
-    // case ViewFinder::Computing:
-    //     if (MeshObject) PoolSystem->ReturnComputingMesh(MeshObject);
-    //     break;
-    // case ViewFinder::None:
-    // default:
-    //     break;
-    // }
+    Super::BeginPlay();
 
-    Super::EndPlay(EndPlayReason);
+    MeshPool = GetWorld()->GetSubsystem<UVFDynamicMeshPoolWorldSubsystem>();
 }
 
-void UVFDynamicMeshComponent::SetDynamicMeshFromPool(UDynamicMesh *Mesh, EVFMeshType Type)
-{
-    MeshType = Type;
-    SetDynamicMesh(Mesh);
-}
+// void UVFDynamicMeshComponent::SetDynamicMeshFromPool(UDynamicMesh *Mesh, EVFMeshType Type)
+// {
+//     MeshType = Type;
+//     SetDynamicMesh(Mesh);
+// }
 
 void UVFDynamicMeshComponent::CopyMeshFromComponent(UPrimitiveComponent *Source)
 {
@@ -47,30 +35,49 @@ void UVFDynamicMeshComponent::CopyMeshFromComponent(UPrimitiveComponent *Source)
         false);
 
     // 复制物理
-    // 复制碰撞预设, 类型等. 原静态网格体的简单碰撞可能与显示不一致, 自动生成的碰撞并不完美(以及不能智能地选择生成碰撞的设置).
-    SetCollisionProfileName(SourceComponent->GetCollisionProfileName());
-    if (SourceComponent->BodyInstance.bSimulatePhysics)
+    // 复制碰撞预设, 类型等. 原静态网格体的简单碰撞可能与显示不一致
+    // 自动生成的碰撞并不完美, 碰撞的设置也是固定的.
+    SetCollisionProfileName(Source->GetCollisionProfileName());
+    if (auto SourceVFDMComp = GetSourceVFDMComp())
     {
-        // 生成简单碰撞模拟物理, 面数该如何抉择?
+        // 从VFDMComp上复制不需要立即应用, 由SetEnabled启用
         SetComplexAsSimpleCollisionEnabled(false, true);
         UpdateSimlpeCollision();
-        // 从静态网格体上复制需要应用物理状态, 但从VFDMComp上复制不需要立即应用
-        bSimulatePhysicsRecorder = SourceComponent->BodyInstance.bSimulatePhysics;
-        bEnableGravityRecorder = SourceComponent->IsGravityEnabled();
-        SetSimulatePhysics(bSimulatePhysicsRecorder);
-        SetEnableGravity(bEnableGravityRecorder);
+        bSimulatePhysicsRecorder = SourceVFDMComp->bSimulatePhysicsRecorder;
+        bEnableGravityRecorder = SourceVFDMComp->bEnableGravityRecorder;
+    }
+    else if (Source->BodyInstance.bSimulatePhysics)
+    {
+        SetComplexAsSimpleCollisionEnabled(false, true);
+        UpdateSimlpeCollision();
+        // 从静态网格体上复制物理状态
+        bSimulatePhysicsRecorder = Source->BodyInstance.bSimulatePhysics;
+        bEnableGravityRecorder = Source->IsGravityEnabled();
     }
     else
     {
         // 使用复杂碰撞
         SetComplexAsSimpleCollisionEnabled(true, true);
     }
-    SetCollisionEnabled(SourceComponent->GetCollisionEnabled());
+    SetCollisionEnabled(Source->GetCollisionEnabled());
 
     // 复制材质
-    SetMaterial(0, SourceComponent->GetMaterial(0));
+    SetMaterial(0, Source->GetMaterial(0));
 
     // TODO: 传递事件. 暂使用Actor接口
+}
+
+void UVFDynamicMeshComponent::ReplaceMeshForComponent(UPrimitiveComponent *Source)
+{
+    CopyMeshFromComponent(Source);
+    
+    Source->SetSimulatePhysics(false);
+    Source->SetCollisionProfileName("NoCollision");
+    Source->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    Source->SetHiddenInGame(true);
+
+    SetSimulatePhysics(bSimulatePhysicsRecorder);
+    SetEnableGravity(bEnableGravityRecorder);
 }
 
 void UVFDynamicMeshComponent::IntersectMeshWithDMComp(UDynamicMeshComponent *Tool)

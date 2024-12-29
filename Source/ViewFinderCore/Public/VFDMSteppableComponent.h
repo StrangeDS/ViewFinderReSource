@@ -9,11 +9,31 @@
 #include "VFDMSteppableComponent.generated.h"
 
 UENUM(BlueprintType)
-enum class UVFDMSteppableCompStep
+enum class UVFDMCompStepOperation
 {
 	BeginPlay = 0,
-	CopyMeshFromComponent = 1,
-	RegisterToTransformRecorder = 2
+	CopyMeshFromComponent,
+	RegisterToTransformRecorder,
+	ReplaceMeshForComponent,
+	// 交集, 差集, 并集需要保存网格体, 故在本地处理
+	IntersectMeshWithDMComp,
+	SubtractMeshWithDMComp,
+	UnionMeshWithDMComp
+};
+
+USTRUCT(BlueprintType)
+struct FVFDMCompStep
+{
+	GENERATED_BODY()
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "ViewFinder")
+	UVFDMCompStepOperation Operation;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "ViewFinder")
+	TObjectPtr<UDynamicMesh> Mesh;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "ViewFinder")
+	float Time = 0.f;
 };
 
 UCLASS(Blueprintable, ClassGroup = (ViewFinder))
@@ -26,22 +46,30 @@ public:
 
 	virtual void BeginPlay() override;
 
-public:
-	virtual void CopyMeshFromComponent(UPrimitiveComponent* Source) override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+
+	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
+	UDynamicMesh *RequestACopiedMesh();
 
 public:
-	virtual bool StepBack_Implementation(FVFStepInfo &StepInfo) override;
+	virtual void CopyMeshFromComponent(UPrimitiveComponent* Source) override;
 	
-	// 不确定是否需要
-	// UPROPERTY(BlueprintReadWrite, Category = "ViewFinder")
-	// bool bNeedUnionToSource = false;
+	virtual void ReplaceMeshForComponent(UPrimitiveComponent *Source) override;
+	
+	virtual void IntersectMeshWithDMComp(UDynamicMeshComponent *Tool) override;
+
+	virtual void SubtractMeshWithDMComp(UDynamicMeshComponent *Tool) override;
+	
+	virtual void UnionMeshWithDMComp(UDynamicMeshComponent *Tool) override;
+
+public:
+	virtual void TickBackward_Implementation(float Time) override;
+
+	virtual bool StepBack_Implementation(FVFStepInfo &StepInfo) override;
 
 	UPROPERTY(BlueprintReadOnly, Category = "ViewFinder")
 	TObjectPtr<UVFStepsRecorderWorldSubsystem> StepRecorder;
 
-	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
-	static FString ToString(UVFDMSteppableCompStep Step);
-	
-	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
-	static UVFDMSteppableCompStep ToStep(FString String);
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ViewFinder")
+	TArray<FVFDMCompStep> Steps;
 };

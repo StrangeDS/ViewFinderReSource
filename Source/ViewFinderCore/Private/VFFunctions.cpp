@@ -96,14 +96,10 @@ TArray<UVFDynamicMeshComponent *> UVFFunctions::CheckVFDMComps(
 					VFDMComp->RegisterComponent();
 					VFDMComp->AttachToComponent(PrimComp, FAttachmentTransformRules::SnapToTargetIncludingScale);
 					Actor->AddInstanceComponent(VFDMComp);
-					VFDMComp->CopyMeshFromComponent(PrimComp);
+					VFDMComp->ReplaceMeshForComponent(PrimComp);
 
 					Result.Add(VFDMComp);
 				}
-				PrimComp->SetSimulatePhysics(false);
-				PrimComp->SetCollisionProfileName("NoCollision");
-				PrimComp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-				PrimComp->SetHiddenInGame(true);
 			}
 		}
 	}

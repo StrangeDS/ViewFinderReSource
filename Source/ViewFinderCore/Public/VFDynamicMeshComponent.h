@@ -2,9 +2,6 @@
 
 #include "CoreMinimal.h"
 #include "Components/DynamicMeshComponent.h"
-
-#include "VFDynamicMeshPoolWorldSubsystem.h"
-
 #include "VFDynamicMeshComponent.generated.h"
 
 UCLASS(Blueprintable, ClassGroup = (ViewFinder), meta = (BlueprintSpawnableComponent))
@@ -15,14 +12,15 @@ class VIEWFINDERCORE_API UVFDynamicMeshComponent : public UDynamicMeshComponent
 public:
 	UVFDynamicMeshComponent(const FObjectInitializer &ObjectInitializer);
 
-	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+	virtual void BeginPlay() override;
 
-public:	// Mesh 
-	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
-	void SetDynamicMeshFromPool(UDynamicMesh *Mesh, EVFMeshType Type);
+public: // Mesh
 
 	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
 	virtual void CopyMeshFromComponent(UPrimitiveComponent *Source);
+
+	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
+	virtual void ReplaceMeshForComponent(UPrimitiveComponent *Source);
 
 	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
 	virtual void IntersectMeshWithDMComp(UDynamicMeshComponent *Tool);
@@ -61,6 +59,6 @@ protected:
 	bool bEnableGravityRecorder = false;
 
 protected:
-	UPROPERTY(VisibleInstanceOnly, BlueprintReadWrite, Category = "ViewFinder")
-	EVFMeshType MeshType = EVFMeshType::None;
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "ViewFinder")
+	TObjectPtr<class UVFDynamicMeshPoolWorldSubsystem> MeshPool;
 };
