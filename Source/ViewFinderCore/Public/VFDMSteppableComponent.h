@@ -65,8 +65,6 @@ public:
 public:
 	virtual void TickBackward_Implementation(float Time) override;
 
-	virtual bool StepBack_Implementation(FVFStepInfo &StepInfo) override;
-
 	UPROPERTY(BlueprintReadOnly, Category = "ViewFinder")
 	TObjectPtr<UVFStepsRecorderWorldSubsystem> StepRecorder;
 

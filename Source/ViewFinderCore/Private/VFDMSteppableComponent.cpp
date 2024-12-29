@@ -13,27 +13,30 @@ void UVFDMSteppableComponent::BeginPlay()
 
     StepRecorder = GetWorld()->GetSubsystem<UVFStepsRecorderWorldSubsystem>();
     check(StepRecorder);
-    StepRecorder->SubmitStep(
-        this,
-        FVFStepInfo{
-            EnumToString<UVFDMCompStepOperation>(
-                UVFDMCompStepOperation::BeginPlay)});
+
+    Steps.Reset();
+    Steps.Add(FVFDMCompStep{
+        UVFDMCompStepOperation::BeginPlay,
+        nullptr,
+        StepRecorder->Time});
     StepRecorder->RegisterTickable(this);
 }
 
 void UVFDMSteppableComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-    if (!Steps.IsEmpty())
+    if (Steps.Num() > 1)
     {
         UE_LOG(LogTemp, Warning,
                TEXT("%s UVFDMSteppableComponent::EndPlay has UDynamicMesh not return %i"),
                *GetOwner()->GetName(),
-               Steps.Num());
+               Steps.Num() - 1);
     }
 
     while (!Steps.IsEmpty())
     {
-        MeshPool->ReturnComputingMesh(Steps.Last().Mesh);
+        auto &StepInfo = Steps.Last();
+        if (StepInfo.Mesh)
+            MeshPool->ReturnComputingMesh(StepInfo.Mesh);
         Steps.Pop(false);
     }
 
@@ -55,18 +58,19 @@ void UVFDMSteppableComponent::CopyMeshFromComponent(UPrimitiveComponent *Source)
 {
     Super::CopyMeshFromComponent(Source);
 
-    StepRecorder->SubmitStep(
-        this,
-        FVFStepInfo{EnumToString<UVFDMCompStepOperation>(
-            UVFDMCompStepOperation::CopyMeshFromComponent)});
+    Steps.Add(FVFDMCompStep{
+        UVFDMCompStepOperation::CopyMeshFromComponent,
+        nullptr,
+        StepRecorder->Time});
 
     if (bSimulatePhysicsRecorder)
     {
         StepRecorder->RecordTransform(this);
-        StepRecorder->SubmitStep(
-            this,
-            FVFStepInfo{EnumToString<UVFDMCompStepOperation>(
-                UVFDMCompStepOperation::RegisterToTransformRecorder)});
+
+        Steps.Add(FVFDMCompStep{
+            UVFDMCompStepOperation::RegisterToTransformRecorder,
+            nullptr,
+            StepRecorder->Time});
     }
 }
 
@@ -74,10 +78,10 @@ void UVFDMSteppableComponent::ReplaceMeshForComponent(UPrimitiveComponent *Sourc
 {
     Super::ReplaceMeshForComponent(Source);
 
-    StepRecorder->SubmitStep(
-        this,
-        FVFStepInfo{EnumToString<UVFDMCompStepOperation>(
-            UVFDMCompStepOperation::ReplaceMeshForComponent)});
+    Steps.Add(FVFDMCompStep{
+        UVFDMCompStepOperation::ReplaceMeshForComponent,
+        nullptr,
+        StepRecorder->Time});
 }
 
 void UVFDMSteppableComponent::IntersectMeshWithDMComp(UDynamicMeshComponent *Tool)
@@ -120,63 +124,52 @@ void UVFDMSteppableComponent::TickBackward_Implementation(float Time)
 
         switch (StepInfo.Operation)
         {
+        case UVFDMCompStepOperation::BeginPlay:
+        {
+            if (GetSourceVFDMComp()) // 复制体上的
+                GetOwner()->Destroy();
+            else
+                DestroyComponent(); // 原网格上的(ReplaceMeshForComponent)创建的
+            return;
+        }
+        case UVFDMCompStepOperation::CopyMeshFromComponent:
+        {
+            // Source不保存的做法
+            // auto SourceVFDMComp = GetSourceVFDMComp();
+            // if (SourceVFDMComp)
+            // {
+            //     SetComponentToWorld(SourceVFDMComp->GetComponentToWorld());
+            //     SourceVFDMComp->UnionMeshWithDMComp(this);
+            // }
+            break;
+        }
+        case UVFDMCompStepOperation::RegisterToTransformRecorder:
+        {
+            StepRecorder->UnrecordTransform(this);
+            break;
+        }
+        case UVFDMCompStepOperation::ReplaceMeshForComponent:
+        {
+            SetEnabled(false);
+
+            SourceComponent->SetHiddenInGame(false);
+            SourceComponent->SetCollisionProfileName(GetCollisionProfileName());
+            SourceComponent->SetCollisionEnabled(GetCollisionEnabled());
+            SourceComponent->SetSimulatePhysics(bSimulatePhysicsRecorder);
+            SourceComponent->BodyInstance.bSimulatePhysics = bEnableGravityRecorder;
+            break;
+        }
         case UVFDMCompStepOperation::IntersectMeshWithDMComp:
         case UVFDMCompStepOperation::SubtractMeshWithDMComp:
         case UVFDMCompStepOperation::UnionMeshWithDMComp:
-        default:
         {
             MeshObject->SetMesh(StepInfo.Mesh->GetMeshRef());
             MeshPool->ReturnComputingMesh(StepInfo.Mesh);
             break;
         }
+        default:
+            break;
         }
         Steps.Pop(false);
     }
-}
-
-bool UVFDMSteppableComponent::StepBack_Implementation(FVFStepInfo &StepInfo)
-{
-    auto CompStep = StringToEnum<UVFDMCompStepOperation>(StepInfo.Info);
-    switch (CompStep)
-    {
-    case UVFDMCompStepOperation::BeginPlay:
-    {
-        if (GetSourceVFDMComp()) // 复制体上的
-            GetOwner()->Destroy();
-        else
-            DestroyComponent(); // 原网格上的(ReplaceMeshForComponent)创建的
-        break;
-    }
-    case UVFDMCompStepOperation::CopyMeshFromComponent:
-    {
-        // Source不保存的做法
-        // auto SourceVFDMComp = GetSourceVFDMComp();
-        // if (SourceVFDMComp)
-        // {
-        //     SetComponentToWorld(SourceVFDMComp->GetComponentToWorld());
-        //     SourceVFDMComp->UnionMeshWithDMComp(this);
-        // }
-        break;
-    }
-    case UVFDMCompStepOperation::RegisterToTransformRecorder:
-    {
-        StepRecorder->UnrecordTransform(this);
-        break;
-    }
-    case UVFDMCompStepOperation::ReplaceMeshForComponent:
-    {
-        SetEnabled(false);
-
-        SourceComponent->SetHiddenInGame(false);
-        SourceComponent->SetCollisionProfileName(GetCollisionProfileName());
-        SourceComponent->SetCollisionEnabled(GetCollisionEnabled());
-        SourceComponent->SetSimulatePhysics(bSimulatePhysicsRecorder);
-        SourceComponent->BodyInstance.bSimulatePhysics = bEnableGravityRecorder;
-        break;
-    }
-    default:
-        return false;
-    }
-
-    return true;
 }
