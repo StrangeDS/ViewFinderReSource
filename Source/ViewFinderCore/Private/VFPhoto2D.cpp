@@ -31,7 +31,7 @@ AVFPhoto2D::AVFPhoto2D() : Super()
 void AVFPhoto2D::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 	Helper->OnCopyAfterCopiedForPhoto.AddUniqueDynamic(this, &AVFPhoto2D::CopyPhoto3D);
 
 	RenderTarget = NewObject<UTextureRenderTarget2D>(this);
@@ -91,7 +91,7 @@ void AVFPhoto2D::FoldUp()
 	Photo3D->FoldUp();
 }
 
-void AVFPhoto2D::Preview(const FTransform& WorldTrans, const bool &Enabled)
+void AVFPhoto2D::Preview(const FTransform &WorldTrans, const bool &Enabled)
 {
 	if (!Photo3D)
 		return;
@@ -118,7 +118,7 @@ void AVFPhoto2D::PlaceDown()
 }
 
 // 递归拷贝Actor
-static AActor* CopyActor(AActor *Actor)
+static AActor *CopyActor(AActor *Actor)
 {
 	auto Res = UVFFunctions::CloneActorRuntime(Actor);
 	TArray<UVFDynamicMeshComponent *> VFDMComps;
@@ -144,5 +144,9 @@ void AVFPhoto2D::CopyPhoto3D()
 	if (!Photo3D)
 		return;
 
-	Photo3D = Cast<AVFPhoto3D>(CopyActor(Photo3D));
+	auto Photo3DNew = Cast<AVFPhoto3D>(CopyActor(Photo3D));
+	Photo3DNew->RecordProperty(Photo3D->ViewFrustumRecorder,
+							   Photo3D->bOnlyOverlapWithHelps,
+							   Photo3D->ObjectTypesToOverlap);
+	Photo3D = Photo3DNew;
 }

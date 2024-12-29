@@ -52,9 +52,6 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "ViewFinder")
 	TObjectPtr<UStaticMeshComponent> StaticMesh;
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "ViewFinder")
-	TObjectPtr<UVFViewFrustumComponent> ViewFrustumRecorder;
 
 public:	// 记录属性
 	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
@@ -62,6 +59,9 @@ public:	// 记录属性
 		UVFViewFrustumComponent *ViewFrustum,
 		bool OnlyWithHelps,
 		const TArray<TEnumAsByte<EObjectTypeQuery>> &ObjectTypes);
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "ViewFinder")
+	TObjectPtr<UVFViewFrustumComponent> ViewFrustumRecorder;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ViewFinder")
 	bool bOnlyOverlapWithHelps = false;
