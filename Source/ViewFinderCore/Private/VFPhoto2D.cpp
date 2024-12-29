@@ -4,6 +4,7 @@
 #include "Engine/TextureRenderTarget2D.h"
 #include "Components/SceneCaptureComponent2D.h"
 
+#include "VFDynamicMeshComponent.h"
 #include "VFPhoto3D.h"
 #include "VFHelperComponent.h"
 #include "VFFunctions.h"
@@ -119,6 +120,15 @@ void AVFPhoto2D::PlaceDown()
 static AActor* CopyActor(AActor *Actor)
 {
 	auto Res = UVFFunctions::CloneActorRuntime(Actor);
+	TArray<UVFDynamicMeshComponent *> VFDMComps;
+	Actor->GetComponents<UVFDynamicMeshComponent>(VFDMComps);
+	for (auto &VFDMComp : VFDMComps)
+	{
+		auto CopiedComp = UVFFunctions::GetCloneVFDMComp(VFDMComp, Res);
+		CopiedComp->CopyMeshFromComponent(VFDMComp);
+	}
+
+	// 深搜子Actors
 	TArray<AActor *> ChildActors;
 	Actor->GetAttachedActors(ChildActors);
 	for (auto &ChildActor : ChildActors)
