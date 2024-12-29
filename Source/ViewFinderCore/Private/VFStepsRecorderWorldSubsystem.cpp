@@ -92,9 +92,10 @@ void UVFStepsRecorderWorldSubsystem::TickBackward(float DeltaTime)
         Infos.Pop(false);
     }
 
-    for (const auto &Target : TickTargets)
+    for (auto &Target : TickTargets)
     {
-        IVFStepsRecordInterface::Execute_TickBackward(Target.GetObject(), Time);
+        if (Target)
+            IVFStepsRecordInterface::Execute_TickBackward(Target.GetObject(), Time);
     }
 }
 

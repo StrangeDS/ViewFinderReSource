@@ -64,5 +64,6 @@ public: // Implements IVFStepsRecordInterface:
 
 	TObjectPtr<UVFStepsRecorderWorldSubsystem> StepRecorder;
 
+	UPROPERTY(BlueprintReadOnly, Category = "ViewFinder")
 	TArray<FVFPhotoContainerStepInfo> Steps;
 };

@@ -164,6 +164,7 @@ void AVFPhotoContainerSteppable::TickBackward_Implementation(float Time)
             auto &Photo = StepInfo.Photo;
             AddAPhoto(Photo);
             SetEnabled(true);
+            GiveUpPreparing();
             break;
         }
         case AVFPhotoContainerSteppableOperation::Prepare:
