@@ -8,7 +8,8 @@ void AVFPhoto2DSteppable::BeginPlay()
     check(StepRecorder);
     StepRecorder->SubmitStep(
         this,
-        FVFStepInfo{ToString(EVFPhoto2DState::None)});
+        FVFStepInfo{EnumToString<EVFPhoto2DState>(
+            EVFPhoto2DState::None)});
 }
 
 void AVFPhoto2DSteppable::FoldUp()
@@ -19,7 +20,8 @@ void AVFPhoto2DSteppable::FoldUp()
     {
         StepRecorder->SubmitStep(
             this,
-            FVFStepInfo{ToString(EVFPhoto2DState::Folded)});
+            FVFStepInfo{EnumToString<EVFPhoto2DState>(
+                EVFPhoto2DState::Folded)});
     }
 }
 
@@ -31,13 +33,14 @@ void AVFPhoto2DSteppable::PlaceDown()
     {
         StepRecorder->SubmitStep(
             this,
-            FVFStepInfo{ToString(EVFPhoto2DState::Placed)});
+            FVFStepInfo{EnumToString<EVFPhoto2DState>(
+                EVFPhoto2DState::Placed)});
     }
 }
 
 bool AVFPhoto2DSteppable::StepBack_Implementation(FVFStepInfo &StepInfo)
 {
-    auto CompStep = ToStep(StepInfo.Info);
+    auto CompStep = StringToEnum<EVFPhoto2DState>(StepInfo.Info);
     switch (CompStep)
     {
     case EVFPhoto2DState::None:
@@ -60,14 +63,4 @@ bool AVFPhoto2DSteppable::StepBack_Implementation(FVFStepInfo &StepInfo)
     }
 
     return true;
-}
-
-FString AVFPhoto2DSteppable::ToString(EVFPhoto2DState Step)
-{
-    return FString::FromInt((int)Step);
-}
-
-EVFPhoto2DState AVFPhoto2DSteppable::ToStep(FString String)
-{
-    return (EVFPhoto2DState)FCString::Atoi(*String);
 }

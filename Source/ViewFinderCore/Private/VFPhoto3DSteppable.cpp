@@ -2,24 +2,29 @@
 
 void AVFPhoto3DSteppable::BeginPlay()
 {
-	StepRecorder = GetWorld()->GetSubsystem<UVFStepsRecorderWorldSubsystem>();
+    StepRecorder = GetWorld()->GetSubsystem<UVFStepsRecorderWorldSubsystem>();
     check(StepRecorder);
     StepRecorder->SubmitStep(
         this,
-        FVFStepInfo{ToString(EVFPhoto3DState::None)});
+        FVFStepInfo{EnumToString<EVFPhoto3DState>(
+            EVFPhoto3DState::None)});
 
-	Super::BeginPlay();
+    Super::BeginPlay();
 }
 
 void AVFPhoto3DSteppable::FoldUp()
 {
+    bool FirstFold = State == EVFPhoto3DState::None;
+
     Super::FoldUp();
 
     if (!StepRecorder->bIsRewinding)
     {
         StepRecorder->SubmitStep(
             this,
-            FVFStepInfo{ToString(EVFPhoto3DState::Folded)});
+            FVFStepInfo{EnumToString<EVFPhoto3DState>(
+                FirstFold ? EVFPhoto3DState::FirstFold
+                          : EVFPhoto3DState::Folded)});
     }
 }
 
@@ -31,28 +36,29 @@ void AVFPhoto3DSteppable::PlaceDown()
     {
         StepRecorder->SubmitStep(
             this,
-            FVFStepInfo{ToString(EVFPhoto3DState::Placed)});
+            FVFStepInfo{EnumToString<EVFPhoto3DState>(
+                EVFPhoto3DState::Placed)});
     }
 }
 
 bool AVFPhoto3DSteppable::StepBack_Implementation(FVFStepInfo &StepInfo)
 {
-    auto CompStep = ToStep(StepInfo.Info);
+    auto CompStep = StringToEnum<EVFPhoto3DState>(StepInfo.Info);
     switch (CompStep)
     {
     case EVFPhoto3DState::None:
     {
-		Destroy();
+        Destroy();
         break;
     }
     case EVFPhoto3DState::Folded:
     {
-		PlaceDown();
+        PlaceDown();
         break;
     }
     case EVFPhoto3DState::Placed:
     {
-		FoldUp();
+        FoldUp();
         break;
     }
     default:
@@ -60,14 +66,4 @@ bool AVFPhoto3DSteppable::StepBack_Implementation(FVFStepInfo &StepInfo)
     }
 
     return true;
-}
-
-FString AVFPhoto3DSteppable::ToString(EVFPhoto3DState Step)
-{
-    return FString::FromInt((int)Step);
-}
-
-EVFPhoto3DState AVFPhoto3DSteppable::ToStep(FString String)
-{
-    return (EVFPhoto3DState)FCString::Atoi(*String);
 }

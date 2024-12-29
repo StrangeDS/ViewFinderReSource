@@ -8,6 +8,7 @@ UENUM(BlueprintType)
 enum class EVFPhoto3DState : uint8
 {
 	None,
+	FirstFold,
 	Folded,
 	Placed
 };

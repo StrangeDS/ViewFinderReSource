@@ -25,10 +25,4 @@ public:
 	
 	UPROPERTY(BlueprintReadOnly, Category = "ViewFinder")
 	TObjectPtr<UVFStepsRecorderWorldSubsystem> StepRecorder;
-
-	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
-	static FString ToString(EVFPhoto3DState Step);
-
-	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
-	static EVFPhoto3DState ToStep(FString String);
 };
