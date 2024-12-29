@@ -17,9 +17,8 @@ AVFPhoto2D::AVFPhoto2D() : Super()
 	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
 	StaticMesh->SetupAttachment(RootComponent);
 	StaticMesh->SetCollisionProfileName(TEXT("IgnoreOnlyPawn"));
-    static ConstructorHelpers::FObjectFinder<UStaticMesh> MeshSelector(
-		TEXT("/Game/ViewFinder/StaticMesh/Plane.Plane")
-		);
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> MeshSelector(
+		TEXT("/Game/ViewFinder/StaticMesh/Photo.Photo"));
 	StaticMeshObject = MeshSelector.Object;
 	StaticMesh->SetStaticMesh(StaticMeshObject);
 	StaticMesh->SetRelativeRotation(FRotator(0.f, 90.0f, 0.f));
@@ -58,7 +57,7 @@ void AVFPhoto2D::SetPhoto3D(AVFPhoto3D *Photo)
 
 AVFPhoto3D *AVFPhoto2D::GetPhoto3D()
 {
-    return Photo3D;
+	return Photo3D;
 }
 
 void AVFPhoto2D::SetPhoto(USceneCaptureComponent2D *Capturer)
@@ -95,7 +94,7 @@ void AVFPhoto2D::Preview(const FTransform &WorldTrans, const bool &Enabled)
 {
 	if (!Photo3D)
 		return;
-	
+
 	if (Enabled)
 	{
 		Photo3D->SetActorTransform(WorldTrans);
