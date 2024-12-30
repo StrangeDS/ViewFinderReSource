@@ -156,6 +156,7 @@ void AVFPhotoContainerSteppable::TickBackward_Implementation(float Time)
                 Photo->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
                 Photo2Ds.PopLast();
                 UpdateCurrentPhoto();
+                Photo->SetActorHiddenInGame(false);
             }
             break;
         }
