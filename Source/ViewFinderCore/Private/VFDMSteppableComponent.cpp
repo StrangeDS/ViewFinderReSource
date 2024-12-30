@@ -58,6 +58,12 @@ void UVFDMSteppableComponent::CopyMeshFromComponent(UPrimitiveComponent *Source)
 {
     Super::CopyMeshFromComponent(Source);
 
+    if (!StepRecorder)
+    {
+        // AVFPhotoCatcherOnBeginPlay会走此路径
+        return;
+    }
+
     Steps.Add(FVFDMCompStep{
         UVFDMCompStepOperation::CopyMeshFromComponent,
         nullptr,
@@ -77,6 +83,12 @@ void UVFDMSteppableComponent::CopyMeshFromComponent(UPrimitiveComponent *Source)
 void UVFDMSteppableComponent::ReplaceMeshForComponent(UPrimitiveComponent *Source)
 {
     Super::ReplaceMeshForComponent(Source);
+
+    if (!StepRecorder)
+    {
+        // AVFPhotoCatcherOnBeginPlay会走此路径
+        return;
+    }
 
     Steps.Add(FVFDMCompStep{
         UVFDMCompStepOperation::ReplaceMeshForComponent,
