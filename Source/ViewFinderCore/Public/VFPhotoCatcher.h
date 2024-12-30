@@ -8,8 +8,8 @@ UCLASS(Blueprintable, ClassGroup = (ViewFinder))
 class VIEWFINDERCORE_API AVFPhotoCatcher : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
+
+public:
 	AVFPhotoCatcher();
 
 	virtual void OnConstruction(const FTransform &Transform) override;
@@ -31,31 +31,31 @@ public:
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ViewFinder")
 	float ViewAngle = 90.0f;
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ViewFinder")
 	float AspectRatio = 16.0f / 9;
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ViewFinder")
 	float StartDis = 20.0f;
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ViewFinder")
-	float EndDis = 1000.0f;
-	
+	float EndDis = 20000.0f;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ViewFinder|ClassSetting")
 	TSubclassOf<class UVFDynamicMeshComponent> VFDMCompClass;
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ViewFinder|ClassSetting")
 	TSubclassOf<class AVFPhoto2D> VFPhoto2DClass;
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ViewFinder|ClassSetting")
 	TSubclassOf<class AVFPhoto3D> VFPhoto3DClass;
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ViewFinder|ClassSetting")
 	TSubclassOf<class AVFPawnStandIn> VFPawnStandInClass;
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ViewFinder")
 	bool bOnlyOverlapWithHelps = false;
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ViewFinder")
 	bool bCuttingOrignal = false;
 
@@ -74,7 +74,7 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ViewFinder")
 	TObjectPtr<class UVFPhotoCaptureComponent> PhotoCapture;
-	
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ViewFinder")
 	TObjectPtr<class UVFViewFrustumComponent> ViewFrustum;
 };
