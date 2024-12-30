@@ -41,7 +41,7 @@ void UVFDynamicMeshComponent::CopyMeshFromComponent(UPrimitiveComponent *Source)
     if (auto SourceVFDMComp = GetSourceVFDMComp())
     {
         // 从VFDMComp上复制不需要立即应用, 由SetEnabled启用
-        SetComplexAsSimpleCollisionEnabled(false, true);
+        SetComplexAsSimpleCollisionEnabled(SourceVFDMComp->bEnableComplexCollision, true);
         UpdateSimlpeCollision();
         bSimulatePhysicsRecorder = SourceVFDMComp->bSimulatePhysicsRecorder;
         bEnableGravityRecorder = SourceVFDMComp->bEnableGravityRecorder;
