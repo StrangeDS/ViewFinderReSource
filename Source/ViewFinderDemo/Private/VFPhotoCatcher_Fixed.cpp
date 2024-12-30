@@ -9,7 +9,7 @@ AVFPhoto2D *AVFPhotoCatcher_Fixed::TakeAPhoto_Implementation()
         TimerHandleOfTakingPhoto, [this]()
         {
             auto Photo = Super::TakeAPhoto_Implementation();
-            Photo->AddActorLocalOffset(PhotoSpawnPoint);
+            Photo->AddActorLocalTransform(PhotoSpawnPoint);
         },
         TimeOfTakingPhoto,
         false);

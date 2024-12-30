@@ -10,8 +10,8 @@ class VIEWFINDERDEMO_API AVFPhotoCatcher_Fixed : public AVFPhotoCatcher_Interact
 	GENERATED_BODY()
 	
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ViewFinder")
-	FVector PhotoSpawnPoint = FVector(0.f, 50.0f, 0.f);
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ViewFinder", meta = (MakeEditWidget))
+	FTransform PhotoSpawnPoint = FTransform::Identity;
 
 	virtual AVFPhoto2D *TakeAPhoto_Implementation() override;
 
