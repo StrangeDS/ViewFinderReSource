@@ -21,7 +21,11 @@ void AVFPhotoCatcherOnBeginPlay::BeginPlay()
         PhotoCapture->PrimitiveRenderMode = ESceneCapturePrimitiveRenderMode::PRM_UseShowOnlyList;
     }
 
-    auto Photo2D = TakeAPhoto();
-    Photo2D->AddActorLocalTransform(PhotoSpawnPoint);
-    Destroy();
+    // UE不支持BeginPlay定义顺序. 若直接在此进行, 碰撞检测到的网格极可能没有BeginPlay,
+    // 且UVFStepsRecorderWorldSubsystem的TransformRecorder也没有进行注册
+    GetWorldTimerManager().SetTimerForNextTick([this](){
+        auto Photo2D = TakeAPhoto();
+        Photo2D->AddActorLocalTransform(PhotoSpawnPoint);
+        Destroy();
+    });
 }

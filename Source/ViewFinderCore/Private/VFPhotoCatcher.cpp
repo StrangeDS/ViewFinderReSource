@@ -39,6 +39,7 @@ AVFPhotoCatcher::AVFPhotoCatcher()
 
 	ViewFrustum = CreateDefaultSubobject<UVFViewFrustumComponent>(TEXT("ViewFrustum"));
 	ViewFrustum->SetupAttachment(RootComponent);
+	ViewFrustum->SetHiddenInGame(true);
 }
 
 void AVFPhotoCatcher::OnConstruction(const FTransform &Transform)
