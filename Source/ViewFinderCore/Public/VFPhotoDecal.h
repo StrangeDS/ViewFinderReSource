@@ -4,6 +4,8 @@
 #include "GameFramework/Actor.h"
 #include "VFPhotoDecal.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FAVFPhotoDecalDelegate);
+
 UCLASS(Blueprintable, ClassGroup = (ViewFinder))
 class VIEWFINDERCORE_API AVFPhotoDecal : public AActor
 {
@@ -18,10 +20,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
 	void DrawDecal();
 
-	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
+	UFUNCTION(BlueprintCallable, CallInEditor, Category = "ViewFinder")
 	void Replace();
 
-	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
+	UFUNCTION(BlueprintCallable, CallInEditor, Category = "ViewFinder")
 	void Restore();
 
 	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
@@ -41,4 +43,10 @@ public:
 
 	UPROPERTY()
 	TObjectPtr<UMaterialInterface> Matirial;
+	
+	UPROPERTY(BlueprintAssignable, Category = "ViewFinder")
+	FAVFPhotoDecalDelegate OnReplace;
+	
+	UPROPERTY(BlueprintAssignable, Category = "ViewFinder")
+	FAVFPhotoDecalDelegate OnRestore;
 };

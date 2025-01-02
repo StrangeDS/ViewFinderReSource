@@ -49,11 +49,15 @@ void AVFPhotoDecal::Replace()
 {
     DrawDecal();
     SetDecalEnabled(true);
+
+    OnReplace.Broadcast();
 }
 
 void AVFPhotoDecal::Restore()
 {
     SetDecalEnabled(false);
+
+    OnRestore.Broadcast();
 }
 
 void AVFPhotoDecal::SetDecalEnabled(bool Enabled)
