@@ -26,13 +26,13 @@ struct FVFPawnTransformInfo
 	GENERATED_USTRUCT_BODY()
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "ViewFinder")
-	FVector Location;
+	FVector Location = FVector::ZeroVector;;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "ViewFinder")
-	FVector Velocity;
+	FVector Velocity = FVector::ZeroVector;;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "ViewFinder")
-	FRotator Rotator;
+	FRotator Rotator = FRotator::ZeroRotator;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "ViewFinder")
 	float Time = 0.f;

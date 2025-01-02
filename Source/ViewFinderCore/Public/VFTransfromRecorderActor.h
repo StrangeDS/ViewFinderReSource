@@ -17,10 +17,10 @@ struct FVFTransCompInfo
 	TObjectPtr<USceneComponent> Component;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "ViewFinder")
-	FTransform Transform;
+	FTransform Transform = FTransform::Identity;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "ViewFinder")
-	FVector Velocity;
+	FVector Velocity = FVector::ZeroVector;
 
 	FVFTransCompInfo() {}
 	FVFTransCompInfo(USceneComponent *Comp) : Component(Comp),

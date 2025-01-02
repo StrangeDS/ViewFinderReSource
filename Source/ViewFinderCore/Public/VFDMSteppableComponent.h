@@ -11,7 +11,8 @@
 UENUM(BlueprintType)
 enum class UVFDMCompStepOperation
 {
-	BeginPlay = 0,
+	None = 0,
+	BeginPlay,
 	CopyMeshFromComponent,
 	RegisterToTransformRecorder,
 	ReplaceMeshForComponent,
@@ -27,7 +28,7 @@ struct FVFDMCompStep
 	GENERATED_BODY()
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "ViewFinder")
-	UVFDMCompStepOperation Operation;
+	UVFDMCompStepOperation Operation = UVFDMCompStepOperation::None;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "ViewFinder")
 	TObjectPtr<UDynamicMesh> Mesh;

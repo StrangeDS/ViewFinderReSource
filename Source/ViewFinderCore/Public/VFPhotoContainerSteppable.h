@@ -28,13 +28,13 @@ struct FVFPhotoContainerStepInfo
 	GENERATED_USTRUCT_BODY()
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "ViewFinder")
-	AVFPhotoContainerSteppableOperation Operation;
+	AVFPhotoContainerSteppableOperation Operation = AVFPhotoContainerSteppableOperation::None;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "ViewFinder")
 	TObjectPtr<class AVFPhoto2D> Photo;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "ViewFinder")
-	float Time;
+	float Time = 0.f;
 };
 
 UCLASS(Blueprintable, ClassGroup = (ViewFinder))
