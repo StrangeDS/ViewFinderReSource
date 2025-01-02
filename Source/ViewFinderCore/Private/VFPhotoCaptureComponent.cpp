@@ -27,13 +27,12 @@ void UVFPhotoCaptureComponent::BeginPlay()
 	}
 }
 
-void UVFPhotoCaptureComponent::Init(UStaticMeshComponent *Mesh,
+void UVFPhotoCaptureComponent::Init(UMaterialInstanceDynamic *Instance,
 									float AspectRatioIn,
-									int Index,
 									FName TextureNameIn,
 									FName RatioNameIn)
 {
-	MaterialInstance = Mesh->CreateAndSetMaterialInstanceDynamic(Index);
+	MaterialInstance = Instance;
 	AspectRatio = AspectRatioIn;
 	TextureName = TextureNameIn;
 	RatioName = RatioNameIn;
@@ -56,4 +55,13 @@ void UVFPhotoCaptureComponent::EndDraw()
 
 	bCaptureEveryFrame = false;
 	MaterialInstance->SetTextureParameterValue(TextureName, OriginalTexture);
+}
+
+void UVFPhotoCaptureComponent::DrawAFrame()
+{
+	if (!MaterialInstance)
+		return;
+	
+	MaterialInstance->SetTextureParameterValue(TextureName, RenderTarget);
+	CaptureScene();
 }

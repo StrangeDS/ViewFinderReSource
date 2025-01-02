@@ -49,7 +49,7 @@ void AVFPhotoCatcher::OnConstruction(const FTransform &Transform)
 	ActorsToIgnore.AddUnique(this);
 	ViewFrustum->RegenerateViewFrustum(ViewAngle, AspectRatio, StartDis, EndDis);
 	PhotoCapture->FOVAngle = ViewAngle;
-	PhotoCapture->Init(StaticMesh, AspectRatio);
+	PhotoCapture->Init(StaticMesh->CreateDynamicMaterialInstance(0), AspectRatio);
 	PhotoCapture->CustomNearClippingPlane = StartDis;
 }
 
