@@ -21,22 +21,22 @@ public:
 	void DrawDecal();
 
 	UFUNCTION(BlueprintCallable, CallInEditor, Category = "ViewFinder")
-	void Replace();
+	virtual void Replace();
 
 	UFUNCTION(BlueprintCallable, CallInEditor, Category = "ViewFinder")
-	void Restore();
+	virtual void Restore();
 
 	UFUNCTION(BlueprintCallable, Category = "ViewFinder")
 	void SetDecalEnabled(bool Enabled);
 
 	UFUNCTION(BlueprintCallable, CallInEditor, Category = "ViewFinder")
-	void SetChildActorsEnabled(bool Enabled);
+	void SetManagedActorsEnabled(bool Enabled);
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ViewFinder")
 	TObjectPtr<class UVFPhotoCaptureComponent> PhotoCapture;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ViewFinder")
-	TArray<AActor *> ChildActors;
+	TArray<AActor *> ManagedActors;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ViewFinder")
 	TObjectPtr<class UDecalComponent> Decal;

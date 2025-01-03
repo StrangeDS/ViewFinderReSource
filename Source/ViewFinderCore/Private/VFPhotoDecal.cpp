@@ -27,11 +27,11 @@ void AVFPhotoDecal::BeginPlay()
     Super::BeginPlay();
 
     // 只记录第一级的子Actor
-    ChildActors.Reset();
-    GetAttachedActors(ChildActors, false, false);
+    ManagedActors.Reset();
+    GetAttachedActors(ManagedActors, false, false);
 
-    TArray<AActor *> ShowActors = ChildActors;
-    for (auto &Actor : ChildActors)
+    TArray<AActor *> ShowActors = ManagedActors;
+    for (auto &Actor : ManagedActors)
     {
         Actor->GetAttachedActors(ShowActors, false, true);
     }
@@ -63,12 +63,12 @@ void AVFPhotoDecal::Restore()
 void AVFPhotoDecal::SetDecalEnabled(bool Enabled)
 {
     Decal->SetHiddenInGame(!Enabled);
-    SetChildActorsEnabled(!Enabled);
+    SetManagedActorsEnabled(!Enabled);
 }
 
-void AVFPhotoDecal::SetChildActorsEnabled(bool Enabled)
+void AVFPhotoDecal::SetManagedActorsEnabled(bool Enabled)
 {
-    for (auto &Actor : ChildActors)
+    for (auto &Actor : ManagedActors)
     {
         Actor->SetActorHiddenInGame(!Enabled);
         Actor->SetActorEnableCollision(Enabled);
