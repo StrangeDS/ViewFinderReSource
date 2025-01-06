@@ -18,7 +18,7 @@ public:
 	void BeginPlay() override;
 
 public:
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "ViewFinder")
 	void GenerateViewFrustum(float Angle, float AspectRatio, float StartDis, float EndDis);
 	virtual void GenerateViewFrustum_Implementation(float Angle, float AspectRatio, float StartDis, float EndDis);
 

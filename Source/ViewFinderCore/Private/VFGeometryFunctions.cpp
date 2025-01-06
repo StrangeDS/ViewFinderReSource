@@ -568,3 +568,5 @@ UDynamicMesh *UVFGeometryFunctions::CopyMeshFromComponent(
 
 	return ToDynamicMesh;
 }
+
+#undef LOCTEXT_NAMESPACE
